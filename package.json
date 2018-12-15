@@ -1,0 +1,33 @@
+{
+  "name": "backend-boilerplate",
+  "version": "1.0.0",
+  "description": "backend-boilerplate",
+  "main": "src/app.ts",
+  "scripts": {
+    "start": "ts-node src/app.ts",
+    "start:watch": "nodemon",
+    "lint": "tslint --force --format verbose \"src/**/*.ts\" \"test/*\"",
+    "build": "tsc --pretty"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "apollo-server-koa": "^2.2.6",
+    "dotenv": "^6.2.0",
+    "graphql": "^14.0.2",
+    "ip": "^1.1.5",
+    "koa": "^2.6.2",
+    "koa-bodyparser": "^4.2.1",
+    "reflect-metadata": "^0.1.12",
+    "typedi": "^0.8.0"
+  },
+  "devDependencies": {
+    "@types/dotenv": "^6.1.0",
+    "@types/graphql": "^14.0.3",
+    "@types/ip": "^0.0.32",
+    "@types/koa": "^2.0.47",
+    "@types/node": "^10.12.15",
+    "ts-node": "^7.0.1",
+    "tslint": "^5.11.0",
+    "typescript": "^3.2.2"
+  }
+}

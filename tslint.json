@@ -1,0 +1,23 @@
+{
+  "extends": "tslint:latest",
+  "jsRules": {},
+  "rules": {
+    "semicolon": true,
+    "class-name": true,
+    "ordered-imports": false,
+    "quotemark": [true, "single"],
+    "object-literal-sort-keys": false,
+    "object-literal-key-quotes": [true, "as-needed"],
+    "arrow-parens": [true, "ban-single-arg-parens"],
+    "variable-name": [true, "ban-keywords", "allow-leading-underscore"],
+    "no-namespace": [true, "allow-declarations"],
+    "interface-over-type-literal": false, // for use type
+    "no-implicit-dependencies": false, // for use alias
+    "no-submodule-imports": false, // for use alias
+    "no-angle-bracket-type-assertion": false,
+    "curly": [true, "ignore-same-line"],
+    "interface-name": false,
+    "max-classes-per-file": false
+  },
+  "rulesDirectory": []
+}
