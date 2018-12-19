@@ -12,24 +12,24 @@ const env = (key: string, defaultValue = '') =>
 
 // runtime environment mode
 export const NODE_ENV = <Environment> env('NODE_ENV', 'development').toLowerCase();
-
-if (!['development', 'stage', 'production', 'test'].includes(NODE_ENV)) {
-  throw new Error(`invalid NODE_ENV: ${NODE_ENV}`);
-}
-
 export const PRODUCTION = NODE_ENV === 'production';
 export const STAGE = NODE_ENV === 'stage';
 export const DEVELOPMENT = NODE_ENV === 'development';
 
+if (!['development', 'stage', 'production'].includes(NODE_ENV)) {
+  throw new Error(`invalid NODE_ENV: ${NODE_ENV}`);
+}
+
 // metadata
-export const PROJECT = 'backend-server';
+export const PROJECT = env('PROJECT', 'Awesome VisuallyLab!');
 export const VERSION = env('VERSION', 'No version info');
 export const IP_ADDRESS = ip.address();
 
 // config
 export const server = {
   port: env('PORT', '8081'),
-  jwtSecret: env('JWT_SECRET'),
+  jwtSecretKey: env('JWT_SECRET_KEY'),
+  jwtExpireIn: env('JWT_EXPIRE_IN'),
 };
 
 export const slack = {

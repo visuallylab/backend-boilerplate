@@ -4,10 +4,8 @@
   "description": "backend-boilerplate",
   "main": "src/app.ts",
   "scripts": {
-    "start": "ts-node src/app.ts",
-    "start:watch": "nodemon",
-    "lint": "tslint --force --format verbose \"src/**/*.ts\" \"test/*\"",
-    "build": "tsc --pretty"
+    "start": "ts-node -r tsconfig-paths/register src/app.ts",
+    "start:watch": "nodemon"
   },
   "license": "MIT",
   "dependencies": {
@@ -15,8 +13,10 @@
     "dotenv": "^6.2.0",
     "graphql": "^14.0.2",
     "ip": "^1.1.5",
+    "jsonwebtoken": "^8.4.0",
     "koa": "^2.6.2",
     "koa-bodyparser": "^4.2.1",
+    "koa-websocket": "^5.0.1",
     "reflect-metadata": "^0.1.12",
     "typedi": "^0.8.0"
   },
@@ -24,9 +24,13 @@
     "@types/dotenv": "^6.1.0",
     "@types/graphql": "^14.0.3",
     "@types/ip": "^0.0.32",
+    "@types/jsonwebtoken": "^8.3.0",
     "@types/koa": "^2.0.47",
+    "@types/koa-websocket": "^5.0.3",
     "@types/node": "^10.12.15",
+    "nodemon": "^1.18.9",
     "ts-node": "^7.0.1",
+    "tsconfig-paths": "^3.7.0",
     "tslint": "^5.11.0",
     "typescript": "^3.2.2"
   }
