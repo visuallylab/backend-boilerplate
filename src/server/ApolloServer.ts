@@ -1,22 +1,23 @@
-import { Service } from 'typedi';
+import { Service, Inject } from 'typedi';
 import * as bodyParser from 'koa-bodyparser';
 import { ApolloServer as ApolloServerKoa } from 'apollo-server-koa';
 
 import * as env from '@/environment';
-import { Logger, LogLevel } from '@/service/logger/Logger';
+import { ILogger } from '@/service/logger/Logger';
+import rootLogger from '@/service/logger/rootLogger';
 import resolvers from '@/graphql/resolvers';
 import typeDefs from '@/graphql/typeDefs';
 
 import { koaServer, KoaServer } from './KoaServer';
-
 // import { createHouseStateDataLoader } from './dataloader';
+// import { Pgsql } from '../service/storage/Pgsql';
 
 @Service()
 export class ApolloServer {
-  private logger: Logger;
+  private logger: ILogger;
   private server: KoaServer = koaServer;
 
-  constructor(logger: Logger) {
+  constructor(logger = rootLogger) {
     this.logger = logger.create('apollo-server');
     this.server.on('error', (error: any) => {
       if (error.status && error.status >= 400 && error.status < 500) {
@@ -26,7 +27,6 @@ export class ApolloServer {
   }
 
   public async launch() {
-
     // TODO: Connect db
 
     this.server.use(async (ctx, next) => {
@@ -59,7 +59,7 @@ export class ApolloServer {
 
     const port = parseInt(env.server.port, 10);
     this.server.listen(port, () => {
-      this.logger.log(LogLevel.Info, `🚀 Server ready at port ${port}`);
+      this.logger.info(`🚀 Server ready at port ${port}`);
     });
   }
 }
