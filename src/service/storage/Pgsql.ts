@@ -1,48 +1,34 @@
-import { Client } from 'pg';
+import { Pool, PoolClient } from 'pg';
 import { Service } from 'typedi';
 
 import { ILogger } from '@/service/logger/Logger';
 import rootLogger from '@/service/logger/rootLogger';
 
 interface IPgsql {
-  connect: () => Promise<Client>;
-  close: () => Promise<void>;
+  connect: () => Promise<PoolClient | undefined>;
 }
-
-// TODO: let every connection has its owen client
 
 @Service()
 export class Pgsql implements IPgsql {
-  private client: Client = new Client();
+  private pool: Pool = new Pool();
+  private clients: PoolClient[] = [];
   private logger: ILogger;
-  private isConnecting: boolean = false;
 
   constructor(logger = rootLogger) {
     this.logger = logger.create('service/pgsql');
+    this.pool.on('error', err => {
+      this.logger.error('Unexpected error on idle client', `${err}`);
+    });
   }
 
   public async connect() {
-    if (this.isConnecting) {
-      return this.client;
+    let client;
+    try {
+      client = await this.pool.connect();
+      this.clients.push(client);
+    } catch (err) {
+      this.logger.error('get connection error', err);
     }
-
-    await this.client.connect();
-
-    this.isConnecting = true;
-
-    this.logger.info('client started');
-
-    this.client.on('error', err => this.logger.error('client error', `${err}`));
-    this.client.on('end', () => this.logger.info('client ended'));
-
-    return this.client;
-  }
-
-  public async close() {
-    if (this.isConnecting) {
-      await this.client.end();
-
-      this.isConnecting = false;
-    }
+    return client;
   }
 }

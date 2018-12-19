@@ -45,6 +45,8 @@ export class Logger implements ILogger {
     // resolve parent before, we always expect high level log printed first.
     if (this.parent) {
       this.parent.send(logLevel, messages);
+    } else {
+      this.send(logLevel, messages);
     }
   }
 

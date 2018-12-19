@@ -1,4 +1,4 @@
-import { Service, Inject } from 'typedi';
+import { Service } from 'typedi';
 import * as bodyParser from 'koa-bodyparser';
 import { ApolloServer as ApolloServerKoa } from 'apollo-server-koa';
 
@@ -10,7 +10,6 @@ import typeDefs from '@/graphql/typeDefs';
 
 import { koaServer, KoaServer } from './KoaServer';
 // import { createHouseStateDataLoader } from './dataloader';
-// import { Pgsql } from '../service/storage/Pgsql';
 
 @Service()
 export class ApolloServer {
@@ -27,8 +26,6 @@ export class ApolloServer {
   }
 
   public async launch() {
-    // TODO: Connect db
-
     this.server.use(async (ctx, next) => {
       try {
         await next();
