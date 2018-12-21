@@ -39,11 +39,13 @@ export const slack = {
 };
 
 export const db = {
-  host: env('DB_HOST'),
-  port: env('DB_PORT'),
-  username: env('DB_USERNAME'),
-  password: env('DB_PASSWORD'),
-  database: env('DB_DATABASE'),
+  pgsql: {
+    host: env('PGSQL_HOST'),
+    port: env('PGSQL_PORT'),
+    username: env('PGSQL_USERNAME'),
+    password: env('PGSQL_PASSWORD'),
+    database: env('PGSQL_DATABASE'),
+  },
 };
 
 export const aws = {

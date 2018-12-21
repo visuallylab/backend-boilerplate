@@ -3,6 +3,7 @@ import { Service } from 'typedi';
 
 import { ILogger } from '@/service/logger/Logger';
 import rootLogger from '@/service/logger/rootLogger';
+import * as env from '@/environment';
 
 interface IPgsql {
   connect: () => Promise<PoolClient | undefined>;
@@ -10,7 +11,13 @@ interface IPgsql {
 
 @Service()
 export class Pgsql implements IPgsql {
-  private pool: Pool = new Pool();
+  private pool: Pool = new Pool({
+    user: env.db.pgsql.username,
+    host: env.db.pgsql.host,
+    database: env.db.pgsql.database,
+    password: env.db.pgsql.password,
+    port: parseInt(env.db.pgsql.port, 10),
+  });
   private clients: PoolClient[] = [];
   private logger: ILogger;
 
