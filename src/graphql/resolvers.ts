@@ -1,5 +1,11 @@
+import itemsResolver from './items/resolvers';
+
 export default {
   Query: {
-    hello: () => 'hello',
+    ...itemsResolver.Query,
+    hello: () => '123',
+  },
+  Mutation: {
+    ...itemsResolver.Mutation,
   },
 };
