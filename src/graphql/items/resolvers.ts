@@ -1,10 +1,9 @@
-import { Container } from 'typedi';
-import { Pgsql } from '@/service/storage/pgsql';
+import { getRepository } from 'typeorm';
 
-const pgsql = Container.get<Pgsql>(Pgsql);
+import Items from '@/entities/Items';
 
 type ItemPayload = {
-  id: string;
+  id: number;
 } & UpdatePayload;
 
 type UpdatePayload = {
@@ -15,79 +14,34 @@ type UpdatePayload = {
 
 export default {
   Query: {
-    items: async () => {
-      let res;
-      const client = await pgsql.connect();
-      if (client) {
-        try {
-          res = await client.query(`
-            SELECT * FROM items
-          `);
-        } finally {
-          client.release();
-        }
-      }
-      return res && res.rows;
-    },
+    items: async () => getRepository(Items).find(),
   },
   Mutation: {
-    // FIXME: @see https://github.com/apollographql/graphql-tools/issues/704
-    // I don't know why I should add any at second param QQ
-    async addItem(_: any, { name, description = '' }: ItemPayload | any) {
-      let res;
-      const client = await pgsql.connect();
-      if (client) {
-        try {
-          res = await client.query(`
-            INSERT INTO items(name, description, complete) VALUES($1, $2, $3) RETURNING *
-          `, [name, description, false]);
-        } finally {
-          client.release();
-        }
-      }
-      return res && res.rows[0];
+    async addItem(_parent: any, { name, description = '' }: ItemPayload) {
+      const item = new Items();
+      item.name = name;
+      item.description = description;
+      item.complete = false;
+
+      await getRepository(Items).save(item);
+      return item;
     },
-    async updateItem(_: any, { id, name, description, complete }: ItemPayload | any) {
-      let res;
-      const client = await pgsql.connect();
-      if (client) {
-        const values = [id];
-        const updateQuery: string[] = [];
-        const updateValues: UpdatePayload = {
-          name,
-          description,
-          complete,
-        };
-        Object.keys(updateValues).forEach(key => {
-          const value = updateValues[key as keyof UpdatePayload];
-          if (value !== undefined) {
-            updateQuery.push(`${key} = $${values.length + 1}`);
-            values.push(value);
-          }
-        });
-        try {
-          res = await client.query(`
-            UPDATE items SET ${updateQuery.join(',')} WHERE id = $1 RETURNING *
-          `, values);
-        } finally {
-          client.release();
-        }
-      }
-      return res && res.rows[0];
+    async updateItem(_parent: any, { id, name, description, complete }: ItemPayload) {
+      const repository = getRepository(Items);
+      const match = await repository.findOne({ id });
+      if (!match) { return; }
+      if (name) { match.name = name; }
+      if (description) { match.description = description; }
+      if (complete) { match.complete = complete; }
+      await repository.save(match);
+      return match;
     },
-    async deleteItem(_: any, { id }: { id: number } | any) {
-      let res;
-      const client = await pgsql.connect();
-      if (client) {
-        try {
-          res = await client.query(`
-            DELETE FROM items where id = $1 RETURNING *
-          `, [id]);
-        } finally {
-          client.release();
-        }
-      }
-      return res && res.rows[0];
+    async deleteItem(_: any, { id }: { id: number }) {
+      const repository = getRepository(Items);
+      const item = await repository.findOne({ id });
+      if (!item) { return; }
+      await repository.remove(item);
+      return item;
     },
   },
 };

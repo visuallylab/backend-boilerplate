@@ -40,4 +40,8 @@ export class Pgsql implements IPgsql {
     }
     return client;
   }
+
+  public async closeAllConnection() {
+    await Promise.all(this.clients.map(client => client.release()));
+  }
 }

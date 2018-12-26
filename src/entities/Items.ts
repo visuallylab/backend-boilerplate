@@ -4,13 +4,13 @@ import { Entity, PrimaryGeneratedColumn, CreateDateColumn, Column } from 'typeor
 class Items {
 
   @PrimaryGeneratedColumn()
-  public id!: string;
+  public id!: number;
 
   @Column({ length: 30 })
   public name!: string;
 
   @Column({ length: 100 })
-  public description!: number;
+  public description!: string;
 
   @Column()
   public complete!: boolean;

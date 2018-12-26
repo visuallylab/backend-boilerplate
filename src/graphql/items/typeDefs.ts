@@ -6,6 +6,6 @@ export const Item = gql`
     name: String!
     description: String!
     complete: Boolean!
-    timestamp: String!
+    createdAt: String!
   }
 `;

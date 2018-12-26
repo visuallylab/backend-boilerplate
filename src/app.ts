@@ -1,16 +1,16 @@
 import 'reflect-metadata';
 import { Container } from 'typedi';
 
-import { OrmService } from './service/OrmService';
+import { DB } from './service/DB';
 import { ApolloServer } from './server/ApolloServer';
 import rootLogger from './service/logger/rootLogger';
 
 const apolloServer = Container.get<ApolloServer>(ApolloServer);
-const ormService = Container.get<OrmService>(OrmService);
+const db = Container.get<DB>(DB);
 
 (async () => {
 
-  await ormService.connect();
+  await db.connect();
   await apolloServer.launch();
 
 })().catch(error => {

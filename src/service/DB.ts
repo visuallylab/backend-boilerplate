@@ -6,16 +6,16 @@ import { ILogger } from '@/service/logger/Logger';
 import rootLogger from '@/service/logger/rootLogger';
 import { db } from '@/environment';
 
-interface IOrmService {
+interface IDB {
   connect: () => Promise<void>;
 }
 
 @Service()
-export class OrmService implements IOrmService {
+export class DB implements IDB {
   private logger: ILogger;
 
   constructor(logger = rootLogger) {
-    this.logger = logger.create('service/orm');
+    this.logger = logger.create('service/db');
   }
 
   public async connect() {
@@ -29,7 +29,7 @@ export class OrmService implements IOrmService {
           password: db.pgsql.password,
           database: db.pgsql.database,
           entities: [
-            path.resolve(__dirname, './entities/*.ts'),
+            path.resolve(__dirname, '../entities/*.ts'),
           ],
           synchronize: true,
           logging: ['error'],
