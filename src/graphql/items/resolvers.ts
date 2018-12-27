@@ -36,7 +36,7 @@ export default {
       await repository.save(match);
       return match;
     },
-    async deleteItem(_: any, { id }: { id: number }) {
+    async deleteItem(_parent: any, { id }: { id: number }) {
       const repository = getRepository(Items);
       const item = await repository.findOne({ id });
       if (!item) { return; }
