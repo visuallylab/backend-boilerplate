@@ -1,5 +1,5 @@
-import { Pool, PoolClient } from 'pg';
 import { Service } from 'typedi';
+import { Pool, PoolClient } from 'pg';
 
 import { ILogger } from '@/service/logger/Logger';
 import rootLogger from '@/service/logger/rootLogger';
@@ -9,14 +9,16 @@ interface IPgsql {
   connect: () => Promise<PoolClient | undefined>;
 }
 
+const { username, host, database, password, port } = env.db.pgsql;
+
 @Service()
 export class Pgsql implements IPgsql {
   private pool: Pool = new Pool({
-    user: env.db.pgsql.username,
-    host: env.db.pgsql.host,
-    database: env.db.pgsql.database,
-    password: env.db.pgsql.password,
-    port: parseInt(env.db.pgsql.port, 10),
+    user: username,
+    host,
+    database,
+    password,
+    port: parseInt(port, 10),
   });
   private clients: PoolClient[] = [];
   private logger: ILogger;
@@ -37,5 +39,9 @@ export class Pgsql implements IPgsql {
       this.logger.error('get connection error', err);
     }
     return client;
+  }
+
+  public async closeAllConnection() {
+    await Promise.all(this.clients.map(client => client.release()));
   }
 }
