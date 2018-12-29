@@ -21,7 +21,6 @@ export default {
       const item = new Items();
       item.name = name;
       item.description = description;
-      item.complete = false;
 
       await getRepository(Items).save(item);
       return item;

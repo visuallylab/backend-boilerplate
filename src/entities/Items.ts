@@ -12,7 +12,7 @@ class Items {
   @Column({ length: 100 })
   public description!: string;
 
-  @Column()
+  @Column({ default: false })
   public complete!: boolean;
 
   @CreateDateColumn()
