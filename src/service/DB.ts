@@ -7,7 +7,7 @@ import { db } from '@/environment';
 
 import Item from '@/entities/Item';
 
-console.log('orm', Item);
+console.log('ormItem', Item);
 
 interface IDB {
   connect: () => Promise<void>;
@@ -35,7 +35,7 @@ export class DB implements IDB {
           password: db.pgsql.password,
           database: db.pgsql.database,
           entities: [
-            // Item,
+            Item,
           ],
           synchronize: true,
           logging: ['error'],
