@@ -4,7 +4,7 @@
   "description": "backend-boilerplate",
   "main": "src/app.ts",
   "scripts": {
-    "start": "ts-node -r tsconfig-paths/register src/app.ts",
+    "start": "ts-node -r tsconfig-paths/register src/app.ts --type-check",
     "start:watch": "nodemon"
   },
   "license": "MIT",
@@ -19,8 +19,10 @@
     "koa-websocket": "^5.0.1",
     "pg": "^7.7.1",
     "reflect-metadata": "^0.1.12",
+    "type-graphql": "^0.16.0",
     "typedi": "^0.8.0",
-    "typeorm": "^0.2.9"
+    "typeorm": "^0.2.9",
+    "typeorm-typedi-extensions": "^0.2.1"
   },
   "devDependencies": {
     "@types/dotenv": "^6.1.0",

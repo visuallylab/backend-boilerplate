@@ -1,15 +1,19 @@
-import { Service } from 'typedi';
+import { Service, Container } from 'typedi';
 import * as bodyParser from 'koa-bodyparser';
+import { buildSchema, useContainer } from 'type-graphql';
 import { ApolloServer as ApolloServerKoa } from 'apollo-server-koa';
 
 import * as env from '@/environment';
 import { ILogger } from '@/service/logger/Logger';
 import rootLogger from '@/service/logger/rootLogger';
-import resolvers from '@/graphql/resolvers';
-import typeDefs from '@/graphql/typeDefs';
 
-import { koaServer, KoaServer } from './KoaServer';
+import { ItemResolver } from '@/resolvers';
+
 // import { createHouseStateDataLoader } from './dataloader';
+import { koaServer, KoaServer } from './KoaServer';
+
+// register type-graphql IOC container
+useContainer(Container);
 
 @Service()
 export class ApolloServer {
@@ -47,16 +51,18 @@ export class ApolloServer {
 
     this.server.use(bodyParser());
 
-    const apolloServer = new ApolloServerKoa({
-      typeDefs,
-      resolvers,
+    const schema = await buildSchema({
+      resolvers: [ItemResolver],
+      dateScalarMode: 'timestamp',
     });
+
+    const apolloServer = new ApolloServerKoa({ schema });
 
     apolloServer.applyMiddleware({ app: this.server });
 
     const port = parseInt(env.server.port, 10);
     this.server.listen(port, () => {
-      this.logger.info(`🚀 Server ready at port ${port}`);
+      this.logger.info(`🚀 Apollo server ready at port ${port}`);
     });
   }
 }
