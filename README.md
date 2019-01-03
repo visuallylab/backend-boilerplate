@@ -10,7 +10,12 @@ service/
     Psql
 server/
   ApolloServer.ts
-graphql/
-  resolvers
-  typeDefs
+resolvers/
+  ...
+```
+
+## Dev
+
+```
+yarn start:watch
 ```
