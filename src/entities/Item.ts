@@ -9,11 +9,11 @@ class Item {
   @PrimaryGeneratedColumn()
   public readonly id!: number;
 
-  @Field(() => String)
+  @Field()
   @Column({ length: 30 })
   public name!: string;
 
-  @Field(() => String, { nullable: true, defaultValue: '' })
+  @Field()
   @Column({ length: 100 })
   public description?: string;
 
@@ -21,7 +21,7 @@ class Item {
   @Column({ default: false })
   public complete?: boolean;
 
-  @Field(() => Date)
+  @Field()
   @CreateDateColumn()
   public createdAt!: Date;
 }

@@ -1,13 +1,10 @@
+import * as path from 'path';
 import { Service, Container } from 'typedi';
 import { createConnections, useContainer } from 'typeorm';
 
 import { ILogger } from '@/service/logger/Logger';
 import rootLogger from '@/service/logger/rootLogger';
 import { db } from '@/environment';
-
-import Item from '@/entities/Item';
-
-console.log('ormItem', Item);
 
 interface IDB {
   connect: () => Promise<void>;
@@ -35,7 +32,7 @@ export class DB implements IDB {
           password: db.pgsql.password,
           database: db.pgsql.database,
           entities: [
-            Item,
+            path.resolve(__dirname, '../entities/*.ts'),
           ],
           synchronize: true,
           logging: ['error'],

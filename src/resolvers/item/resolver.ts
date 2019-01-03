@@ -1,20 +1,10 @@
 import { Repository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { Resolver, Query, Arg, Int } from 'type-graphql';
+import { Resolver, Query, Arg, Int, Mutation } from 'type-graphql';
 
-import Item from '@/entities/item';
-// console.log(123);
-// type ItemPayload = {
-//   id: number;
-// } & UpdatePayload;
+import Item from '@/entities/Item';
 
-// type UpdatePayload = {
-//   name: string;
-//   description: string;
-//   complete: boolean;
-// };
-
-// const item = Container.get<Item>(Item);
+import { AddItemInput, UpdateItemInput } from './types';
 
 @Resolver(Item)
 export class ItemResolver {
@@ -27,49 +17,47 @@ export class ItemResolver {
     return '1233';
   }
 
-  @Query(() => Item,  { nullable: true })
-  public item(
-    @Arg('itemId', () => Int) itemId: number,
-  ) {
+  @Query(() => Item, { nullable: true })
+  public async item(@Arg('itemId', () => Int) itemId: number) {
     return this.itemsRepository.findOne({ id: itemId });
   }
 
   @Query(() => [Item])
-  public items() {
+  public async items() {
     return this.itemsRepository.find();
   }
 
+  @Mutation(() => Item)
+  public async addItem(@Arg('item') itemInput: AddItemInput) {
+    const item = this.itemsRepository.create({ ...itemInput });
+    await this.itemsRepository.save(item);
+    return item;
+  }
+
+  @Mutation(() => Item)
+  public async updateItem(
+    @Arg('id') id: number,
+    @Arg('item') itemInput: UpdateItemInput,
+  ) {
+    const { name, description, complete } = itemInput;
+    const match = await this.itemsRepository.findOne({ id });
+    if (!match) { return; }
+    if (name) { match.name = name; }
+    if (description) { match.description = description; }
+    if (complete) { match.complete = complete; }
+
+    await this.itemsRepository.save(match);
+    return match;
+  }
+
+  @Mutation(() => String)
+  public async deleteItem(
+    @Arg('id') id: number,
+  ) {
+    const item = await this.itemsRepository.findOne({ id });
+    if (!item) { return 'No this item!'; }
+
+    await this.itemsRepository.remove(item);
+    return `Delete item id: ${id}`;
+  }
 }
-
-// export default {
-//   Query: {
-//     items: async () => getRepository(Items).find(),
-//   },
-//   Mutation: {
-//     async addItem(_parent: any, { name, description = '' }: ItemPayload) {
-//       const item = new Items();
-//       item.name = name;
-//       item.description = description;
-
-//       await getRepository(Items).save(item);
-//       return item;
-//     },
-//     async updateItem(_parent: any, { id, name, description, complete }: ItemPayload) {
-//       const repository = getRepository(Items);
-//       const match = await repository.findOne({ id });
-//       if (!match) { return; }
-//       if (name) { match.name = name; }
-//       if (description) { match.description = description; }
-//       if (complete) { match.complete = complete; }
-//       await repository.save(match);
-//       return match;
-//     },
-//     async deleteItem(_parent: any, { id }: { id: number }) {
-//       const repository = getRepository(Items);
-//       const item = await repository.findOne({ id });
-//       if (!item) { return; }
-//       await repository.remove(item);
-//       return item;
-//     },
-//   },
-// };
