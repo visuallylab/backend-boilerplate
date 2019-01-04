@@ -1,6 +1,6 @@
 import * as path from 'path';
-import { Service } from 'typedi';
-import { createConnections } from 'typeorm';
+import { Service, Container } from 'typedi';
+import { createConnections, useContainer } from 'typeorm';
 
 import { ILogger } from '@/service/logger/Logger';
 import rootLogger from '@/service/logger/rootLogger';
@@ -9,6 +9,9 @@ import { db } from '@/environment';
 interface IDB {
   connect: () => Promise<void>;
 }
+
+// register IOC container
+useContainer(Container);
 
 @Service()
 export class DB implements IDB {
