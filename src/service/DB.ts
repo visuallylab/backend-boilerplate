@@ -38,7 +38,7 @@ export class DB implements IDB {
           logging: ['error'],
         },
       ]);
-      this.logger.info('DB orm is connected!');
+      this.logger.info('🚀 DB orm is connected!');
     } catch (err) {
       this.logger.error(err);
     }
