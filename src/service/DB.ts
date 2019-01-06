@@ -10,11 +10,11 @@ interface IDB {
   connect: () => Promise<void>;
 }
 
-// register IOC container
+// register typeorm IOC container
 useContainer(Container);
 
 @Service()
-export class DB implements IDB {
+export default class DB implements IDB {
   private logger: ILogger;
 
   constructor(logger = rootLogger) {

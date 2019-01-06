@@ -1,5 +1,7 @@
 import { Field, ObjectType, ID } from 'type-graphql';
-import { Entity, PrimaryGeneratedColumn, CreateDateColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, CreateDateColumn, Column, ManyToOne } from 'typeorm';
+
+import User from './User';
 
 @Entity()
 @ObjectType()
@@ -20,6 +22,10 @@ class Item {
   @Field(() => Boolean, { nullable: true })
   @Column({ default: false })
   public complete?: boolean;
+
+  @Field(() => User)
+  @ManyToOne(() => User, user => user.items)
+  public user!: User;
 
   @Field()
   @CreateDateColumn()
