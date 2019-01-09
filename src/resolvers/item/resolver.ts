@@ -1,6 +1,6 @@
 import { Repository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { Resolver, Query, Arg, Int, Mutation, Ctx } from 'type-graphql';
+import { Resolver, Query, Arg, Int, Mutation, Ctx, FieldResolver, Root } from 'type-graphql';
 
 import Item from '@/entities/Item';
 import User from '@/entities/User';
@@ -17,15 +17,12 @@ export class ItemResolver {
 
   @Query(() => Item, { nullable: true })
   public async item(@Arg('itemId', () => Int) itemId: number) {
-    return this.itemsRepository.findOne({ id: itemId }, {
-      relations: ['user'],
-    });
+    return this.itemsRepository.findOne({ id: itemId });
   }
 
   @Query(() => [Item])
   public async items() {
     return this.itemsRepository.find({
-      relations: ['user'],
       order: {
         id: 'DESC',
       },
@@ -78,5 +75,10 @@ export class ItemResolver {
 
     await this.itemsRepository.remove(item);
     return `Delete item id: ${id}`;
+  }
+
+  @FieldResolver()
+  protected async user(@Root() item: Item, @Ctx() ctx: Context) {
+    return ctx.dataLoader.loaders.Item.user.load(item);
   }
 }

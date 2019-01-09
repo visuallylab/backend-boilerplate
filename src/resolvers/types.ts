@@ -3,4 +3,10 @@ export type Context = {
     uuid: string;
     email: string;
   };
+  dataLoader: {
+    initialized: boolean;
+    loaders: {
+      [key: string]: any;
+    }
+  }
 };

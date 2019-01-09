@@ -1,3 +1,4 @@
+import * as path from 'path';
 import * as Koa from 'koa';
 import { Service, Container, Inject } from 'typedi';
 import * as bodyParser from 'koa-bodyparser';
@@ -9,10 +10,8 @@ import JwtService from '@/service/JwtService';
 import { ILogger } from '@/service/logger/Logger';
 import rootLogger from '@/service/logger/rootLogger';
 
-import { ItemResolver, UserResolver } from '@/resolvers';
-
-import { createLoaders } from './dataloader';
 import koaServer, { KoaServer } from './KoaServer';
+import DataLoaderMiddleware from './middleware/DataLoaderMiddleware';
 
 // register type-graphql IOC container
 useContainer(Container);
@@ -57,24 +56,27 @@ export default class ApolloServer {
     this.server.use(bodyParser());
 
     const schema = await buildSchema({
-      resolvers: [ItemResolver, UserResolver],
+      globalMiddlewares: [DataLoaderMiddleware],
+      resolvers: [
+        path.resolve(__dirname, '../resolvers/**/resolver.ts'),
+      ],
       dateScalarMode: 'timestamp',
     });
 
     const apolloServer = new ApolloServerKoa({
       schema,
+      tracing: true,
       context: async ({ ctx }: { ctx: Koa.Context }) => {
         const token = ctx.request.headers.authorization;
-        const loaders = createLoaders();
         try {
           const me = await this.jwt.verify(token);
           return {
+            ...ctx,
             me,
-            loaders,
           };
         } catch (e) {
           return {
-            loaders,
+            ...ctx,
           };
         }
       },
