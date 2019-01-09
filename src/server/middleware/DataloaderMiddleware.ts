@@ -5,8 +5,9 @@
  */
 
 import * as DataLoader from 'dataloader';
-import { getConnection } from 'typeorm';
+import { Connection } from 'typeorm';
 import { Service } from 'typedi';
+import { InjectConnection } from 'typeorm-typedi-extensions';
 import { MiddlewareInterface, NextFn, ResolverData } from 'type-graphql';
 
 import { Context } from '@/resolvers/types';
@@ -16,6 +17,9 @@ import rootLogger from '@/service/logger/rootLogger';
 @Service()
 export default class DataLoaderMiddleware implements MiddlewareInterface<Context> {
   private logger: ILogger;
+
+  @InjectConnection()
+  private connection!: Connection;
 
   constructor(logger = rootLogger) {
     this.logger = logger.create('middleware/dataloader');
@@ -29,10 +33,9 @@ export default class DataLoaderMiddleware implements MiddlewareInterface<Context
         loaders: {},
       };
 
-      const connection = await getConnection();
       const loaders = context.dataLoader.loaders;
 
-      connection.entityMetadatas.forEach(entityMetadata => {
+      this.connection.entityMetadatas.forEach(entityMetadata => {
         const resolverName = entityMetadata.targetName;
         if (!resolverName) {
           return;
@@ -49,8 +52,8 @@ export default class DataLoaderMiddleware implements MiddlewareInterface<Context
             // create a new instance of dataloader for every relation
             loaders[resolverName][relationName] = new DataLoader(
               entities => {
-                this.logger.debug(`dataloader load: ${resolverName}.${relationName}`);
-                return connection.relationIdLoader
+                this.logger.debug(`load: ${resolverName}.${relationName}`);
+                return this.connection.relationIdLoader
                   // dataloader should return all entity object with parent and children.
                   .loadManyToManyRelationIdsAndGroup(relation, entities)
                   .then(groups => groups.map(group => group.related));
