@@ -28,9 +28,9 @@ export class AuthResolver {
 
     const isValidPassword = await bcrypt.compare(login.password, user.password);
     if (isValidPassword) {
-      const { uuid, displayName, email } = user;
+      const { id, displayName, email } = user;
       return {
-        token: this.jwt.sign({ uuid, displayName, email }),
+        token: this.jwt.sign({ id, displayName, email }),
         user,
       };
     } else {

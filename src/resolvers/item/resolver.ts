@@ -33,7 +33,7 @@ export class ItemResolver {
   @Authorized()
   @Mutation(() => Item)
   public async addItem(@Arg('item') itemInput: AddItemInput, @Ctx() ctx: Context) {
-    const user = await this.userRepository.findOne({ uuid: ctx.me.uuid });
+    const user = await this.userRepository.findOne({ id: ctx.me.id });
     const item = this.itemsRepository.create({
       ...itemInput,
       user,

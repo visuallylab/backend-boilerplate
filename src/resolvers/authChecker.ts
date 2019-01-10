@@ -34,7 +34,7 @@ export const authChecker: AuthChecker<Context> = ({ context: { me } }, roles) =>
 };
 
 export const createDummyMe = (option?: { [key: string]: any }): Context['me'] => ({
-  uuid: '19514b75-1f74-4eb9-990b-e974126f3207',
+  id: '19514b75-1f74-4eb9-990b-e974126f3207',
   displayName: 'dummy',
   email: 'dummy@email.com',
   roles: [Role.Admin],

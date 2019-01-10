@@ -5,7 +5,7 @@ export enum Role {
 
 export type Context = {
   me: {
-    uuid: string;
+    id: string;
     displayName: string;
     email: string;
     roles: Role[];

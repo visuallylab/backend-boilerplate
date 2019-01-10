@@ -9,7 +9,7 @@ class User {
   @Authorized()
   @Field(() => ID)
   @PrimaryGeneratedColumn('uuid')
-  public uuid: string;
+  public id: string;
 
   // @Field() no need to query
   @Column()

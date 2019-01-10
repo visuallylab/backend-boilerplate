@@ -19,8 +19,8 @@ export class UserResolver {
 
   @Authorized()
   @Query(() => User, { nullable: true })
-  public async user(@Arg('uuid') uuid: string) {
-    return this.userRepository.findOne({ uuid });
+  public async user(@Arg('id') id: string) {
+    return this.userRepository.findOne({ id });
   }
 
   @Authorized()
@@ -46,11 +46,11 @@ export class UserResolver {
   @Authorized()
   @Mutation(() => User)
   public async updateUser(
-    @Arg('uuid') uuid: string,
+    @Arg('id') id: string,
     @Arg('user') userInput: UpdateUserInput,
   ) {
     const { displayName, email } = userInput;
-    const match = await this.userRepository.findOne({ uuid });
+    const match = await this.userRepository.findOne({ id });
     if (!match) { return; }
     if (displayName) { match.displayName = displayName; }
     if (email) { match.email = email; }
@@ -62,10 +62,10 @@ export class UserResolver {
   @Authorized()
   @Mutation(() => User)
   public async deleteUser(
-    @Arg('uuid') uuid: string,
+    @Arg('id') id: string,
     @Ctx() ctx: Context,
   ) {
-    const user = await this.userRepository.findOne({ uuid });
+    const user = await this.userRepository.findOne({ id });
     if (!user) {
       throw new ForbiddenError('No this user!');
     }
