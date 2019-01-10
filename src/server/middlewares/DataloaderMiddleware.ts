@@ -19,7 +19,7 @@ export default class DataLoaderMiddleware implements MiddlewareInterface<Context
   private logger: ILogger;
 
   @InjectConnection()
-  private connection!: Connection;
+  private connection: Connection;
 
   constructor(logger = rootLogger) {
     this.logger = logger.create('middleware/dataloader');

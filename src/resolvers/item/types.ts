@@ -5,10 +5,10 @@ import Item from '@/entities/Item';
 @InputType()
 export class AddItemInput implements Partial<Item> {
   @Field()
-  public name!: string;
+  public name: string;
 
   @Field({ defaultValue: '' })
-  public description!: string;
+  public description?: string;
 }
 
 @InputType()

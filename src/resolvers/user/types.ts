@@ -6,13 +6,13 @@ import User from '@/entities/User';
 export class CreateUserInput implements Partial<User> {
 
   @Field()
-  public displayName!: string;
+  public displayName: string;
 
   @Field()
-  public email!: string;
+  public email: string;
 
   @Field()
-  public password!: string;
+  public password: string;
 }
 
 @InputType()

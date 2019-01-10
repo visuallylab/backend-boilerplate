@@ -3,7 +3,7 @@ import * as Koa from 'koa';
 import { Service, Container, Inject } from 'typedi';
 import * as bodyParser from 'koa-bodyparser';
 import { buildSchema, useContainer } from 'type-graphql';
-import { ApolloServer as ApolloServerKoa, AuthenticationError } from 'apollo-server-koa';
+import { ApolloServer as ApolloServerKoa } from 'apollo-server-koa';
 
 import { DEVELOPMENT, SKIP_AUTH, server } from '@/environment';
 import JwtService from '@/service/JwtService';
@@ -24,7 +24,7 @@ export default class ApolloServer {
   private server: KoaServer = koaServer;
 
   @Inject()
-  private jwt!: JwtService;
+  private jwt: JwtService;
 
   constructor(logger = rootLogger) {
     this.logger = logger.create('apollo-server');
@@ -69,7 +69,7 @@ export default class ApolloServer {
 
     const apolloServer = new ApolloServerKoa({
       schema,
-      tracing: DEVELOPMENT, // only for development
+      tracing: !!DEVELOPMENT, // only for development
       context: async ({ ctx }: { ctx: Koa.Context }) => {
         const token = ctx.request.headers.authorization;
 
@@ -81,7 +81,7 @@ export default class ApolloServer {
           const me = await this.jwt.verify<Context['me']>(token);
           return { me };
         } catch (e) {
-          throw new AuthenticationError(e);
+          return;
         }
       },
     });

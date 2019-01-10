@@ -9,19 +9,19 @@ class User {
   @Authorized()
   @Field(() => ID)
   @PrimaryGeneratedColumn('uuid')
-  public uuid!: string;
+  public uuid: string;
 
   // @Field() no need to query
   @Column()
-  public password!: string;
+  public password: string;
 
   @Field()
   @Column()
-  public displayName!: string;
+  public displayName: string;
 
   @Field()
   @Column()
-  public email!: string;
+  public email: string;
 
   @Field()
   @Column({ nullable: true })
@@ -30,12 +30,12 @@ class User {
   @Authorized()
   @Field(() => [Item])
   @OneToMany(() => Item, item => item.user)
-  public items!: Item[];
+  public items: Item[];
 
   @Authorized()
   @Field()
   @CreateDateColumn()
-  public createdAt!: Date;
+  public createdAt: Date;
 
   @Authorized()
   @Field()

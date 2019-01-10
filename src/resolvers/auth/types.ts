@@ -4,18 +4,18 @@ import User from '@/entities/User';
 @InputType()
 export class LoginInput {
   @Field()
-  public email!: string;
+  public email: string;
 
   @Field()
-  public password!: string;
+  public password: string;
 }
 
 @ObjectType()
 export class LoginOutput {
 
   @Field()
-  public token!: string;
+  public token: string;
 
   @Field()
-  public user!: User;
+  public user: User;
 }

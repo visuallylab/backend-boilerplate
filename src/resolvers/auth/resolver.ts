@@ -13,7 +13,7 @@ import { LoginInput, LoginOutput } from './types';
 @Resolver()
 export class AuthResolver {
   @Inject()
-  private jwt!: JwtService;
+  private jwt: JwtService;
 
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
