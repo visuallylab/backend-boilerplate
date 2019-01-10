@@ -1,6 +1,6 @@
 import { Repository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { Resolver, Query, Arg, Int, Mutation, Ctx, FieldResolver, Root } from 'type-graphql';
+import { Resolver, Query, Arg, Int, Mutation, Ctx, FieldResolver, Root, Authorized } from 'type-graphql';
 
 import Item from '@/entities/Item';
 import User from '@/entities/User';
@@ -29,6 +29,7 @@ export class ItemResolver {
     });
   }
 
+  @Authorized()
   @Mutation(() => Item)
   public async addItem(@Arg('item') itemInput: AddItemInput, @Ctx() ctx: Context) {
     let user;
@@ -37,7 +38,7 @@ export class ItemResolver {
     } else {
       const users = await this.userRepository.find({
         order: {
-          uuid: 'ASC',
+          createdAt: 'DESC',
         },
       });
       user = users[0];
@@ -50,6 +51,7 @@ export class ItemResolver {
     return item;
   }
 
+  @Authorized()
   @Mutation(() => Item)
   public async updateItem(
     @Arg('id') id: number,
@@ -66,6 +68,7 @@ export class ItemResolver {
     return match;
   }
 
+  @Authorized()
   @Mutation(() => String)
   public async deleteItem(
     @Arg('id') id: number,

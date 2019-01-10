@@ -9,9 +9,11 @@ import * as env from '@/environment';
 import JwtService from '@/service/JwtService';
 import { ILogger } from '@/service/logger/Logger';
 import rootLogger from '@/service/logger/rootLogger';
+import { authChecker } from '@/resolvers/authChecker';
+import { Context } from '@/resolvers/types';
 
 import koaServer, { KoaServer } from './KoaServer';
-import DataLoaderMiddleware from './middleware/DataLoaderMiddleware';
+import DataLoaderMiddleware from './middlewares/DataLoaderMiddleware';
 
 // register type-graphql IOC container
 useContainer(Container);
@@ -60,6 +62,7 @@ export default class ApolloServer {
       resolvers: [
         path.resolve(__dirname, '../resolvers/**/resolver.ts'),
       ],
+      authChecker,
       dateScalarMode: 'timestamp',
     });
 
@@ -69,7 +72,7 @@ export default class ApolloServer {
       context: async ({ ctx }: { ctx: Koa.Context }) => {
         const token = ctx.request.headers.authorization;
         try {
-          const me = await this.jwt.verify(token);
+          const me = await this.jwt.verify<Context['me']>(token);
           return {
             ...ctx,
             me,
