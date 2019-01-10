@@ -16,7 +16,7 @@ const defaultSignOptions = {
 
 @Service()
 export default class JwtService implements IJwtService {
-  private secret = new Buffer(env.server.jwtSecretKey, 'base64');
+  private secret = Buffer.from(env.server.jwtSecretKey, 'base64');
 
   public sign(payload: Payload, options: SignOptions = defaultSignOptions) {
     return new Promise<string>((resolve, reject) => {
