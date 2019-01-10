@@ -14,6 +14,6 @@ export type Context = {
     initialized: boolean;
     loaders: {
       [key: string]: any;
-    }
+    } & object;
   }
 };

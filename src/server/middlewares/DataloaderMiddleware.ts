@@ -41,14 +41,13 @@ export default class DataLoaderMiddleware implements MiddlewareInterface<Context
           return;
         }
 
-        if (!loaders[resolverName]) {
+        if (!loaders.hasOwnProperty(resolverName)) {
           loaders[resolverName] = {};
         }
 
         entityMetadata.relations.forEach(relation => {
           const relationName = relation.propertyName;
-          // define data loader for this method if it was not defined yet
-          if (!loaders[resolverName][relationName]) {
+          if (!loaders[resolverName].hasOwnProperty(relationName)) {
             // create a new instance of dataloader for every relation
             loaders[resolverName][relationName] = new DataLoader(
               entities => {
