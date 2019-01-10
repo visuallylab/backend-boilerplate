@@ -1,5 +1,6 @@
 import { Repository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
+import { ForbiddenError } from 'apollo-server-koa';
 import { Resolver, Query, Arg, Mutation, FieldResolver, Root, Ctx, Authorized } from 'type-graphql';
 
 import User from '@/entities/User';
@@ -51,16 +52,21 @@ export class UserResolver {
   }
 
   @Authorized()
-  @Mutation(() => String)
+  @Mutation(() => User)
   public async deleteUser(
     @Arg('uuid') uuid: string,
+    @Ctx() ctx: Context,
   ) {
     const user = await this.userRepository.findOne({ uuid });
-    if (!user) { return 'No this item!'; }
+    if (!user) {
+      throw new ForbiddenError('No this user!');
+    }
+    const items = await ctx.dataLoader.loaders.User.items.load(user);
+    const copyUser = { ...user, items };
 
+    await this.itemRepository.remove(items);
     await this.userRepository.remove(user);
-    await this.itemRepository.remove(user.items);
-    return `Delete item id: ${uuid}`;
+    return copyUser;
   }
 
   @FieldResolver()

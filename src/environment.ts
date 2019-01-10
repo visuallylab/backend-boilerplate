@@ -25,6 +25,10 @@ export const PROJECT = env('PROJECT', 'Awesome VisuallyLab!');
 export const VERSION = env('VERSION', 'No version info');
 export const IP_ADDRESS = ip.address();
 
+// functionality
+// always skip api auth in stage for development
+export const SKIP_AUTH = true;
+
 // config
 export const server = {
   port: env('PORT', '8081'),

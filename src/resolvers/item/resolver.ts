@@ -1,6 +1,7 @@
 import { Repository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Resolver, Query, Arg, Int, Mutation, Ctx, FieldResolver, Root, Authorized } from 'type-graphql';
+import { ForbiddenError } from 'apollo-server-koa';
 
 import Item from '@/entities/Item';
 import User from '@/entities/User';
@@ -32,17 +33,7 @@ export class ItemResolver {
   @Authorized()
   @Mutation(() => Item)
   public async addItem(@Arg('item') itemInput: AddItemInput, @Ctx() ctx: Context) {
-    let user;
-    if (ctx.me) {
-      user = await this.userRepository.findOne({ uuid: ctx.me.uuid });
-    } else {
-      const users = await this.userRepository.find({
-        order: {
-          createdAt: 'DESC',
-        },
-      });
-      user = users[0];
-    }
+    const user = await this.userRepository.findOne({ uuid: ctx.me.uuid });
     const item = this.itemsRepository.create({
       ...itemInput,
       user,
@@ -69,15 +60,17 @@ export class ItemResolver {
   }
 
   @Authorized()
-  @Mutation(() => String)
-  public async deleteItem(
-    @Arg('id') id: number,
-  ) {
+  @Mutation(() => Item)
+  public async deleteItem(@Arg('id') id: number) {
     const item = await this.itemsRepository.findOne({ id });
-    if (!item) { return 'No this item!'; }
+    if (!item) {
+      throw new ForbiddenError('No this item!');
+    }
+    const copyItem = { ...item };
 
     await this.itemsRepository.remove(item);
-    return `Delete item id: ${id}`;
+
+    return copyItem;
   }
 
   @FieldResolver()

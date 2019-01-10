@@ -3,13 +3,13 @@ import * as Koa from 'koa';
 import { Service, Container, Inject } from 'typedi';
 import * as bodyParser from 'koa-bodyparser';
 import { buildSchema, useContainer } from 'type-graphql';
-import { ApolloServer as ApolloServerKoa } from 'apollo-server-koa';
+import { ApolloServer as ApolloServerKoa, AuthenticationError } from 'apollo-server-koa';
 
-import * as env from '@/environment';
+import { DEVELOPMENT, SKIP_AUTH, server } from '@/environment';
 import JwtService from '@/service/JwtService';
 import { ILogger } from '@/service/logger/Logger';
 import rootLogger from '@/service/logger/rootLogger';
-import { authChecker } from '@/resolvers/authChecker';
+import { authChecker, createDummyMe } from '@/resolvers/authChecker';
 import { Context } from '@/resolvers/types';
 
 import koaServer, { KoaServer } from './KoaServer';
@@ -61,6 +61,7 @@ export default class ApolloServer {
       globalMiddlewares: [DataLoaderMiddleware],
       resolvers: [
         path.resolve(__dirname, '../resolvers/**/resolver.ts'),
+        path.resolve(__dirname, '../resolvers/**/resolver.js'),
       ],
       authChecker,
       dateScalarMode: 'timestamp',
@@ -68,26 +69,26 @@ export default class ApolloServer {
 
     const apolloServer = new ApolloServerKoa({
       schema,
-      tracing: true,
+      tracing: DEVELOPMENT, // only for development
       context: async ({ ctx }: { ctx: Koa.Context }) => {
         const token = ctx.request.headers.authorization;
+
+        if (SKIP_AUTH) {
+          return { me: createDummyMe() };
+        }
+
         try {
           const me = await this.jwt.verify<Context['me']>(token);
-          return {
-            ...ctx,
-            me,
-          };
+          return { me };
         } catch (e) {
-          return {
-            ...ctx,
-          };
+          throw new AuthenticationError(e);
         }
       },
     });
 
     apolloServer.applyMiddleware({ app: this.server });
 
-    const port = parseInt(env.server.port, 10);
+    const port = parseInt(server.port, 10);
     this.server.listen(port, () => {
       this.logger.info(`🚀 Apollo server ready at port ${port}`);
     });
