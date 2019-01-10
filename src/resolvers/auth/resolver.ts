@@ -1,5 +1,6 @@
-import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 import { Inject } from 'typedi';
+import { Repository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Resolver, Arg, Mutation } from 'type-graphql';
 import { ForbiddenError } from 'apollo-server-koa';
@@ -25,7 +26,8 @@ export class AuthResolver {
       throw new ForbiddenError('No this user!');
     }
 
-    if (user.password === login.password) {
+    const isValidPassword = await bcrypt.compare(login.password, user.password);
+    if (isValidPassword) {
       const { uuid, displayName, email } = user;
       return {
         token: this.jwt.sign({ uuid, displayName, email }),

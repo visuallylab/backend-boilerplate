@@ -10,6 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "apollo-server-koa": "^2.2.6",
+    "bcrypt": "^3.0.3",
     "dataloader": "^1.4.0",
     "dotenv": "^6.2.0",
     "graphql": "^14.0.2",
@@ -27,6 +28,7 @@
     "typeorm-typedi-extensions": "^0.2.1"
   },
   "devDependencies": {
+    "@types/bcrypt": "^3.0.0",
     "@types/dotenv": "^6.1.0",
     "@types/graphql": "^14.0.3",
     "@types/ip": "^0.0.32",

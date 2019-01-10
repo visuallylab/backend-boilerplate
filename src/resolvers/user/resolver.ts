@@ -1,3 +1,4 @@
+import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { ForbiddenError } from 'apollo-server-koa';
@@ -30,7 +31,14 @@ export class UserResolver {
 
   @Mutation(() => User)
   public async createUser(@Arg('user') userInput: CreateUserInput) {
-    const user = this.userRepository.create({ ...userInput });
+    const saltedHash = await bcrypt.hash(userInput.password, 10); // salted password
+
+    const saltedUser = {
+      ...userInput,
+      password: saltedHash,
+    };
+
+    const user = this.userRepository.create({ ...saltedUser });
     await this.userRepository.save(user);
     return user;
   }
