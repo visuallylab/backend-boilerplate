@@ -65,11 +65,11 @@ export default class ApolloServer {
       ],
       authChecker,
       dateScalarMode: 'timestamp',
+      emitSchemaFile: !!DEVELOPMENT, // only for development
     });
 
     const apolloServer = new ApolloServerKoa({
       schema,
-      tracing: !!DEVELOPMENT, // only for development
       context: async ({ ctx }: { ctx: Koa.Context }) => {
         const token = ctx.request.headers.authorization;
 
@@ -84,6 +84,7 @@ export default class ApolloServer {
           return;
         }
       },
+      tracing: !!DEVELOPMENT, // only for development
     });
 
     apolloServer.applyMiddleware({ app: this.server });
