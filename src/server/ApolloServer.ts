@@ -10,7 +10,7 @@ import JwtService from '@/service/JwtService';
 import { ILogger } from '@/service/logger/Logger';
 import rootLogger from '@/service/logger/rootLogger';
 import { authChecker, createDummyMe } from '@/resolvers/authChecker';
-import { Context } from '@/resolvers/types';
+import { Context } from '@/resolvers/typings';
 
 import koaServer, { KoaServer } from './KoaServer';
 import DataLoaderMiddleware from './middlewares/DataLoaderMiddleware';
@@ -61,7 +61,7 @@ export default class ApolloServer {
       globalMiddlewares: [DataLoaderMiddleware],
       resolvers: [
         path.resolve(__dirname, '../resolvers/**/resolver.ts'),
-        path.resolve(__dirname, '../resolvers/**/resolver.js'),
+        path.resolve(__dirname, '../resolvers/**/resolver.js'), // production will bundle .js
       ],
       authChecker,
       dateScalarMode: 'timestamp',

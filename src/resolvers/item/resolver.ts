@@ -6,7 +6,8 @@ import { ForbiddenError } from 'apollo-server-koa';
 import Item from '@/entities/Item';
 import User from '@/entities/User';
 
-import { Context } from '../types';
+// import { FindOptions } from '../types';
+import { Context } from '../typings';
 import { AddItemInput, UpdateItemInput } from './types';
 
 @Resolver(Item)
@@ -22,12 +23,11 @@ export class ItemResolver {
   }
 
   @Query(() => [Item])
-  public async items() {
-    return this.itemsRepository.find({
-      order: {
-        id: 'DESC',
-      },
-    });
+  public async items(
+    // @Arg('options', () => FindOptions, { nullable: true }) findOptions: FindOptions<Item>,
+  ) {
+    // console.log('find options', findOptions);
+    return this.itemsRepository.find();
   }
 
   @Authorized()

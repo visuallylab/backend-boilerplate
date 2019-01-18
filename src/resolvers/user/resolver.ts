@@ -7,7 +7,7 @@ import { Resolver, Query, Arg, Mutation, FieldResolver, Root, Ctx, Authorized } 
 import User from '@/entities/User';
 import Item from '@/entities/Item';
 
-import { Context } from '../types';
+import { Context } from '../typings';
 import { CreateUserInput, UpdateUserInput } from './types';
 
 @Resolver(User)

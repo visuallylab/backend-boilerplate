@@ -12,7 +12,7 @@
 
 import { AuthChecker } from 'type-graphql';
 
-import { Context, Role } from '@/resolvers/types';
+import { Context, Role } from '@/resolvers/typings';
 
 export const authChecker: AuthChecker<Context> = ({ context: { me } }, roles) => {
   if (roles.length === 0) {

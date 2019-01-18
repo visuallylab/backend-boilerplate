@@ -10,7 +10,7 @@ import { Service } from 'typedi';
 import { InjectConnection } from 'typeorm-typedi-extensions';
 import { MiddlewareInterface, NextFn, ResolverData } from 'type-graphql';
 
-import { Context } from '@/resolvers/types';
+import { Context } from '@/resolvers/typings';
 import { ILogger } from '@/service/logger/Logger';
 import rootLogger from '@/service/logger/rootLogger';
 
