@@ -23,6 +23,24 @@ type Item {
   createdAt: Timestamp!
 }
 
+input ItemFindOptionsInput {
+  where: ItemWhereType
+  order: ItemOrderType
+}
+
+input ItemOrderType {
+  id: String
+  createdAt: String
+}
+
+input ItemWhereType {
+  id: ID
+  name: String
+  description: String
+  complete: Boolean
+  createdAt: Timestamp
+}
+
 input LoginInput {
   email: String!
   password: String!
@@ -45,9 +63,9 @@ type Mutation {
 
 type Query {
   item(itemId: Int!): Item
-  items: [Item!]!
+  items(findOptions: ItemFindOptionsInput): [Item!]!
   user(id: String!): User
-  users: [User!]!
+  users(findOptions: UserFindOptionsInput): [User!]!
 }
 
 # The javascript `Date` as integer. Type represents date and time as number of milliseconds from start of UNIX epoch.
@@ -73,4 +91,25 @@ type User {
   itemCount: Int!
   createdAt: Timestamp!
   updatedAt: Timestamp!
+}
+
+input UserFindOptionsInput {
+  where: UserWhereType
+  order: UserOrderType
+}
+
+input UserOrderType {
+  id: String
+  itemCount: String
+  createdAt: String
+}
+
+input UserWhereType {
+  id: ID
+  displayName: String
+  email: String
+  avatar: String
+  itemCount: Int
+  createdAt: Timestamp
+  updatedAt: Timestamp
 }

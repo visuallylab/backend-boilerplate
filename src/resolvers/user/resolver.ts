@@ -8,7 +8,7 @@ import User from '@/entities/User';
 import Item from '@/entities/Item';
 
 import { Context } from '../typings';
-import { CreateUserInput, UpdateUserInput } from './types';
+import { CreateUserInput, UpdateUserInput, FindOptionsInput } from './types';
 
 @Resolver(User)
 export class UserResolver {
@@ -25,8 +25,14 @@ export class UserResolver {
 
   @Authorized()
   @Query(() => [User])
-  public async users() {
-    return this.userRepository.find();
+  public async users(
+    @Arg('findOptions', () => FindOptionsInput, { nullable: true }) findOptions: FindOptionsInput,
+  ) {
+    // FIXME: should no use seperator
+    return this.userRepository.find({
+      where: { ...findOptions.where },
+      order: { ...findOptions.order },
+    });
   }
 
   @Mutation(() => User)
