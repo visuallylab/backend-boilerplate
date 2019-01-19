@@ -1,6 +1,7 @@
 import { Repository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Resolver, Query, Arg, Int, Mutation, Ctx, FieldResolver, Root, Authorized } from 'type-graphql';
+import { cloneDeep } from 'lodash';
 import { ForbiddenError } from 'apollo-server-koa';
 
 import Item from '@/entities/Item';
@@ -25,11 +26,8 @@ export class ItemResolver {
   public async items(
     @Arg('findOptions', () => FindOptionsInput, { nullable: true}) findOptions: FindOptionsInput,
   ) {
-    // FIXME: should no use seperator
-    return this.itemsRepository.find({
-      where: { ...findOptions.where },
-      order: { ...findOptions.order },
-    });
+    const copy = cloneDeep(findOptions);
+    return this.itemsRepository.find(copy);
   }
 
   @Authorized()

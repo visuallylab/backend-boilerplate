@@ -1,4 +1,5 @@
 import * as bcrypt from 'bcrypt';
+import { cloneDeep } from 'lodash';
 import { Repository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { ForbiddenError } from 'apollo-server-koa';
@@ -28,11 +29,8 @@ export class UserResolver {
   public async users(
     @Arg('findOptions', () => FindOptionsInput, { nullable: true }) findOptions: FindOptionsInput,
   ) {
-    // FIXME: should no use seperator
-    return this.userRepository.find({
-      where: { ...findOptions.where },
-      order: { ...findOptions.order },
-    });
+    const copy = cloneDeep(findOptions);
+    return this.userRepository.find(copy);
   }
 
   @Mutation(() => User)
