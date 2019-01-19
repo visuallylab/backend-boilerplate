@@ -1,4 +1,4 @@
-import { Authorized, Field, ObjectType, ID } from 'type-graphql';
+import { Authorized, Field, ObjectType, ID, Int } from 'type-graphql';
 import { Entity, PrimaryGeneratedColumn, CreateDateColumn, Column, UpdateDateColumn, OneToMany } from 'typeorm';
 
 import Item from './Item';
@@ -31,6 +31,10 @@ class User {
   @Field(() => [Item])
   @OneToMany(() => Item, item => item.user)
   public items: Item[];
+
+  @Authorized()
+  @Field(() => Int)
+  public itemCount: number;
 
   @Authorized()
   @Field()

@@ -81,4 +81,10 @@ export class UserResolver {
   protected async items(@Root() user: User, @Ctx() ctx: Context) {
     return ctx.dataLoader.loaders.User.items.load(user);
   }
+
+  @FieldResolver()
+  protected async itemCount(@Root() user: User, @Ctx() ctx: Context) {
+    const items = await ctx.dataLoader.loaders.User.items.load(user);
+    return items.length;
+  }
 }

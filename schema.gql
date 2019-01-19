@@ -70,6 +70,7 @@ type User {
   email: String!
   avatar: String!
   items: [Item!]!
+  itemCount: Int!
   createdAt: Timestamp!
   updatedAt: Timestamp!
 }
