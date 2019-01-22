@@ -1,5 +1,6 @@
 import { config } from 'dotenv';
 import * as path from 'path';
+import * as yargs from 'yargs';
 import * as ip from 'ip';
 
 // read .env file
@@ -7,8 +8,12 @@ config({ path: path.resolve(__dirname, '../.env') });
 
 type Environment = 'development' | 'stage' | 'production';
 
-const env = (key: string, defaultValue = '') =>
-  process.env[key] || defaultValue;
+const argv = yargs
+  .option('--skip-auth', { boolean: true, default: false })
+  .argv;
+
+const env = (key: string, defaultValue = '') => process.env[key] || defaultValue;
+const arg = (key: string, defaultValue?: any) => argv[key] || defaultValue;
 
 // runtime environment mode
 export const NODE_ENV = <Environment> env('NODE_ENV', 'development').toLowerCase();
@@ -24,6 +29,9 @@ if (!['development', 'stage', 'production'].includes(NODE_ENV)) {
 export const PROJECT = env('PROJECT', 'Awesome VisuallyLab!');
 export const VERSION = env('VERSION', 'No version info');
 export const IP_ADDRESS = ip.address();
+
+// functionality
+export const SKIP_AUTH = !!arg('--skip-auth', STAGE); // always skip auth in stage
 
 // config
 export const server = {

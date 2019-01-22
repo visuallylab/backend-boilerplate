@@ -16,6 +16,8 @@ resolvers/
 
 ## Dev
 
+- Node version: `>v10`
+
 ```
 yarn start:watch
 ```

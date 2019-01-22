@@ -15,8 +15,8 @@ const defaultSignOptions = {
 };
 
 @Service()
-export class JwtService implements IJwtService {
-  private secret = new Buffer(env.server.jwtSecretKey, 'base64');
+export default class JwtService implements IJwtService {
+  private secret = Buffer.from(env.server.jwtSecretKey, 'base64');
 
   public sign(payload: Payload, options: SignOptions = defaultSignOptions) {
     return new Promise<string>((resolve, reject) => {
@@ -30,7 +30,7 @@ export class JwtService implements IJwtService {
     });
   }
 
-  public verify<T extends object | string>(token: string, options: VerifyOptions) {
+  public verify<T extends object | string>(token: string, options?: VerifyOptions) {
     return new Promise<T>((resolve, reject) => {
       verify(token, this.secret, options, (err: VerifyErrors, decoded: object | string) => {
         if (err) {

@@ -1,24 +1,30 @@
-import { Service, Container } from 'typedi';
+import * as path from 'path';
+import * as Koa from 'koa';
+import { Service, Container, Inject } from 'typedi';
 import * as bodyParser from 'koa-bodyparser';
 import { buildSchema, useContainer } from 'type-graphql';
 import { ApolloServer as ApolloServerKoa } from 'apollo-server-koa';
 
-import * as env from '@/environment';
+import { DEVELOPMENT, SKIP_AUTH, server } from '@/environment';
+import JwtService from '@/service/JwtService';
 import { ILogger } from '@/service/logger/Logger';
 import rootLogger from '@/service/logger/rootLogger';
+import { authChecker, createDummyMe } from '@/resolvers/authChecker';
+import { Context } from '@/resolvers/typings';
 
-import { ItemResolver } from '@/resolvers';
-
-// import { createHouseStateDataLoader } from './dataloader';
-import { koaServer, KoaServer } from './KoaServer';
+import koaServer, { KoaServer } from './KoaServer';
+import DataLoaderMiddleware from './middlewares/DataLoaderMiddleware';
 
 // register type-graphql IOC container
 useContainer(Container);
 
 @Service()
-export class ApolloServer {
+export default class ApolloServer {
   private logger: ILogger;
   private server: KoaServer = koaServer;
+
+  @Inject()
+  private jwt: JwtService;
 
   constructor(logger = rootLogger) {
     this.logger = logger.create('apollo-server');
@@ -52,15 +58,38 @@ export class ApolloServer {
     this.server.use(bodyParser());
 
     const schema = await buildSchema({
-      resolvers: [ItemResolver],
+      globalMiddlewares: [DataLoaderMiddleware],
+      resolvers: [
+        path.resolve(__dirname, '../resolvers/**/resolver.ts'),
+        path.resolve(__dirname, '../resolvers/**/resolver.js'), // production will bundle .js
+      ],
+      authChecker,
       dateScalarMode: 'timestamp',
+      emitSchemaFile: !!DEVELOPMENT, // only for development
     });
 
-    const apolloServer = new ApolloServerKoa({ schema });
+    const apolloServer = new ApolloServerKoa({
+      schema,
+      context: async ({ ctx }: { ctx: Koa.Context }) => {
+        const token = ctx.request.headers.authorization;
+
+        if (SKIP_AUTH) {
+          return { me: createDummyMe() };
+        }
+
+        try {
+          const me = await this.jwt.verify<Context['me']>(token);
+          return { me };
+        } catch (e) {
+          return;
+        }
+      },
+      tracing: !!DEVELOPMENT, // only for development
+    });
 
     apolloServer.applyMiddleware({ app: this.server });
 
-    const port = parseInt(env.server.port, 10);
+    const port = parseInt(server.port, 10);
     this.server.listen(port, () => {
       this.logger.info(`🚀 Apollo server ready at port ${port}`);
     });

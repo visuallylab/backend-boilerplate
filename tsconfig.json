@@ -12,6 +12,7 @@
       "@/*": ["./src/*"]
     },
     "strict": true,
+    "strictPropertyInitialization" : false,
     "sourceMap": true,
     "outDir": "build",
     "allowJs": true,

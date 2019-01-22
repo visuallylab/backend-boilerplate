@@ -1,21 +1,21 @@
 import { Repository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { Resolver, Query, Arg, Int, Mutation } from 'type-graphql';
+import { Resolver, Query, Arg, Int, Mutation, Ctx, FieldResolver, Root, Authorized } from 'type-graphql';
+import { cloneDeep } from 'lodash';
+import { ForbiddenError } from 'apollo-server-koa';
 
 import Item from '@/entities/Item';
+import User from '@/entities/User';
 
-import { AddItemInput, UpdateItemInput } from './types';
+import { Context } from '../typings';
+import { AddItemInput, UpdateItemInput, FindOptionsInput } from './types';
 
 @Resolver(Item)
 export class ItemResolver {
   constructor(
     @InjectRepository(Item) private readonly itemsRepository: Repository<Item>,
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
-
-  @Query(() => String)
-  public hello() {
-    return '1233';
-  }
 
   @Query(() => Item, { nullable: true })
   public async item(@Arg('itemId', () => Int) itemId: number) {
@@ -23,17 +23,26 @@ export class ItemResolver {
   }
 
   @Query(() => [Item])
-  public async items() {
-    return this.itemsRepository.find();
+  public async items(
+    @Arg('findOptions', () => FindOptionsInput, { nullable: true}) findOptions: FindOptionsInput,
+  ) {
+    const copy = cloneDeep(findOptions);
+    return this.itemsRepository.find(copy);
   }
 
+  @Authorized()
   @Mutation(() => Item)
-  public async addItem(@Arg('item') itemInput: AddItemInput) {
-    const item = this.itemsRepository.create({ ...itemInput });
+  public async addItem(@Arg('item') itemInput: AddItemInput, @Ctx() ctx: Context) {
+    const user = await this.userRepository.findOne({ id: ctx.me.id });
+    const item = this.itemsRepository.create({
+      ...itemInput,
+      user,
+    });
     await this.itemsRepository.save(item);
     return item;
   }
 
+  @Authorized()
   @Mutation(() => Item)
   public async updateItem(
     @Arg('id') id: number,
@@ -50,14 +59,22 @@ export class ItemResolver {
     return match;
   }
 
-  @Mutation(() => String)
-  public async deleteItem(
-    @Arg('id') id: number,
-  ) {
+  @Authorized()
+  @Mutation(() => Item)
+  public async deleteItem(@Arg('id') id: number) {
     const item = await this.itemsRepository.findOne({ id });
-    if (!item) { return 'No this item!'; }
+    if (!item) {
+      throw new ForbiddenError('No this item!');
+    }
+    const copyItem = { ...item };
 
     await this.itemsRepository.remove(item);
-    return `Delete item id: ${id}`;
+
+    return copyItem;
+  }
+
+  @FieldResolver()
+  protected async user(@Root() item: Item, @Ctx() ctx: Context) {
+    return ctx.dataLoader.loaders.Item.user.load(item);
   }
 }
