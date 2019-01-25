@@ -8,19 +8,19 @@ import * as env from '@/environment';
 
 import DB from './service/DB';
 import KoaServer from './server/KoaServer';
-import ApolloServer from './server/ApolloServer';
+import ApolloServerKoa from './server/ApolloServerKoa';
 import rootLogger from './service/logger/rootLogger';
 
 const db = Container.get<DB>(DB);
 const koaServer = Container.get<KoaServer>(KoaServer);
-const apolloServer = Container.get<ApolloServer>(ApolloServer);
+const apolloServerKoa = Container.get<ApolloServerKoa>(ApolloServerKoa);
 
 (async () => {
 
   await db.connect();
 
   const httpServer = await koaServer.initializeServer();
-  const gqlServer = await apolloServer.initializeServer();
+  const gqlServer = await apolloServerKoa.initializeServer();
 
   gqlServer.applyMiddleware({ app: httpServer });
 

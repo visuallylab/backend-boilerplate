@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as Koa from 'koa';
 import { Service, Inject } from 'typedi';
 import { buildSchema } from 'type-graphql';
-import { ApolloServer as ApolloServerKoa } from 'apollo-server-koa';
+import { ApolloServer } from 'apollo-server-koa';
 
 import { DEVELOPMENT, SKIP_AUTH } from '@/environment';
 import JwtService from '@/service/JwtService';
@@ -14,10 +14,10 @@ import { Context } from '@/resolvers/typings';
 import DataLoaderMiddleware from './middlewares/DataLoaderMiddleware';
 
 @Service()
-export default class ApolloServer {
+export default class ApolloServerKoa {
   private initialized: boolean = false;
   private logger: ILogger;
-  private server: ApolloServerKoa;
+  private server: ApolloServer;
 
   @Inject()
   private jwt: JwtService;
@@ -27,7 +27,7 @@ export default class ApolloServer {
     this.initializeServer();
   }
 
-  public async initializeServer(): Promise<ApolloServerKoa> {
+  public async initializeServer(): Promise<ApolloServer> {
     if (!this.initialized) {
       const schema = await buildSchema({
         globalMiddlewares: [DataLoaderMiddleware],
@@ -40,7 +40,7 @@ export default class ApolloServer {
         emitSchemaFile: !!DEVELOPMENT, // only for development
       });
 
-      const apolloServer = new ApolloServerKoa({
+      const apolloServer = new ApolloServer({
         schema,
         context: async ({ ctx }: { ctx: Koa.Context }) => {
           const token = ctx.request.headers.authorization;
