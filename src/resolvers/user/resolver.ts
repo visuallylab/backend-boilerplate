@@ -76,7 +76,7 @@ export class UserResolver {
 
     // user 連帶的 items 一起刪掉
     const items = await ctx.dataLoader.loaders.User.items.load(user);
-    const copyUser = { ...user, items: cloneDeep(items) };
+    const copyUser = { ...user, items };
 
     await this.itemRepository.remove(items);
     await this.userRepository.remove(user);
@@ -98,9 +98,12 @@ export class UserResolver {
 
   @FieldResolver()
   protected async itemCount(@Root() user: User, @Ctx() ctx: Context) {
-    const items = await ctx.dataLoader.loaders.User.items.load(user);
-    if (!items) {
-      return user.items.length;
+    let items = await ctx.dataLoader.loaders.User.items.load(user);
+    if (items.length === 0) {
+      const isDeletedUser = await this.userRepository.findOne({ id: user.id });
+      if (!isDeletedUser) {
+        items = user.items;
+      }
     }
     return items.length;
   }
