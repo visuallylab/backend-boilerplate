@@ -4,7 +4,7 @@ import { Service, Inject } from 'typedi';
 import { buildSchema } from 'type-graphql';
 import { ApolloServer } from 'apollo-server-koa';
 
-import { DEVELOPMENT, SKIP_AUTH } from '@/environment';
+import { DEVELOPMENT, SKIP_AUTH, TEST, test } from '@/environment';
 import JwtService from '@/service/JwtService';
 import { ILogger } from '@/service/logger/Logger';
 import rootLogger from '@/service/logger/rootLogger';
@@ -43,13 +43,14 @@ export default class ApolloServerKoa {
       const apolloServer = new ApolloServer({
         schema,
         context: async ({ ctx }: { ctx: Koa.Context }) => {
-          const token = ctx.request.headers.authorization;
-
           if (SKIP_AUTH) {
-            return { me: createDummyMe() };
+            // always skip auth in stage & test
+            const testUser = (TEST && test.user) || {};
+            return { me: createDummyMe(testUser) };
           }
 
           try {
+            const token = ctx.request.headers.authorization;
             const me = await this.jwt.verify<Context['me']>(token);
             return { me };
           } catch (e) {

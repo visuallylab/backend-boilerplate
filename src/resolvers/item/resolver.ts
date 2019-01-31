@@ -61,20 +61,24 @@ export class ItemResolver {
 
   @Authorized()
   @Mutation(() => Item)
-  public async deleteItem(@Arg('id') id: number) {
+  public async deleteItem(@Arg('id') id: number, @Ctx() ctx: Context) {
     const item = await this.itemsRepository.findOne({ id });
     if (!item) {
       throw new ForbiddenError('No this item!');
     }
-    const copyItem = { ...item };
 
+    const user = await ctx.dataLoader.loaders.Item.user.load(item);
+    const copyItem = { ...item, user };
     await this.itemsRepository.remove(item);
-
     return copyItem;
   }
 
   @FieldResolver()
   protected async user(@Root() item: Item, @Ctx() ctx: Context) {
-    return ctx.dataLoader.loaders.Item.user.load(item);
+    let user = await ctx.dataLoader.loaders.Item.user.load(item);
+    if (!user) {
+      user = item.user;
+    }
+    return user;
   }
 }

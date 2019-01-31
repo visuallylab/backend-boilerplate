@@ -20,13 +20,15 @@ const apolloServerKoa = Container.get<ApolloServerKoa>(ApolloServerKoa);
   await db.connect();
 
   const httpServer = await koaServer.initializeServer();
-  const gqlServer = await apolloServerKoa.initializeServer();
-
-  gqlServer.applyMiddleware({ app: httpServer });
+  {
+    // gqlServer is an no-need resource, it can be released.
+    const gqlServer = await apolloServerKoa.initializeServer();
+    gqlServer.applyMiddleware({ app: httpServer });
+  }
 
   const port = parseInt(env.server.port, 10);
   httpServer.listen(port, () => {
-    rootLogger.info(`🚀 Server ready at port ${port}`);
+    rootLogger.info(`🚀 HTTP Server ready at port ${port}`);
   });
 
 })().catch(error => {

@@ -73,22 +73,35 @@ export class UserResolver {
     if (!user) {
       throw new ForbiddenError('No this user!');
     }
+
+    // user 連帶的 items 一起刪掉
     const items = await ctx.dataLoader.loaders.User.items.load(user);
-    const copyUser = { ...user, items };
+    const copyUser = { ...user, items: cloneDeep(items) };
 
     await this.itemRepository.remove(items);
     await this.userRepository.remove(user);
+
     return copyUser;
   }
 
   @FieldResolver()
   protected async items(@Root() user: User, @Ctx() ctx: Context) {
-    return ctx.dataLoader.loaders.User.items.load(user);
+    let items = await ctx.dataLoader.loaders.User.items.load(user);
+    if (items.length === 0) {
+      const isDeletedUser = await this.userRepository.findOne({ id: user.id });
+      if (!isDeletedUser) {
+        items = user.items;
+      }
+    }
+    return items;
   }
 
   @FieldResolver()
   protected async itemCount(@Root() user: User, @Ctx() ctx: Context) {
     const items = await ctx.dataLoader.loaders.User.items.load(user);
+    if (!items) {
+      return user.items.length;
+    }
     return items.length;
   }
 }

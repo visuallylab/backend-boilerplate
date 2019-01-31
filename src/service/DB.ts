@@ -4,7 +4,7 @@ import { createConnections } from 'typeorm';
 
 import { ILogger } from '@/service/logger/Logger';
 import rootLogger from '@/service/logger/rootLogger';
-import { db } from '@/environment';
+import { db, TEST } from '@/environment';
 
 interface IDB {
   connect: () => Promise<void>;
@@ -32,7 +32,8 @@ export default class DB implements IDB {
             path.resolve(__dirname, '../entities/*.ts'),
           ],
           synchronize: true,
-          logging: ['error'],
+          logging: TEST ? false : ['error'],
+          dropSchema: !!TEST, // only for test
         },
       ]);
       this.logger.info('🚀 DB orm is connected!');
