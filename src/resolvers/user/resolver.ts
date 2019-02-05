@@ -74,7 +74,7 @@ export class UserResolver {
       throw new ForbiddenError('No this user!');
     }
 
-    // user 連帶的 items 一起刪掉
+    // also delete the items of user
     const items = await ctx.dataLoader.loaders.User.items.load(user);
     const copyUser = { ...user, items };
 
@@ -88,8 +88,8 @@ export class UserResolver {
   protected async items(@Root() user: User, @Ctx() ctx: Context) {
     let items = await ctx.dataLoader.loaders.User.items.load(user);
     if (items.length === 0) {
-      const isDeletedUser = await this.userRepository.findOne({ id: user.id });
-      if (!isDeletedUser) {
+      const isExistedUser = await this.userRepository.findOne({ id: user.id });
+      if (!isExistedUser) {
         items = user.items;
       }
     }
@@ -100,8 +100,8 @@ export class UserResolver {
   protected async itemCount(@Root() user: User, @Ctx() ctx: Context) {
     let items = await ctx.dataLoader.loaders.User.items.load(user);
     if (items.length === 0) {
-      const isDeletedUser = await this.userRepository.findOne({ id: user.id });
-      if (!isDeletedUser) {
+      const isExistedUser = await this.userRepository.findOne({ id: user.id });
+      if (!isExistedUser) {
         items = user.items;
       }
     }
