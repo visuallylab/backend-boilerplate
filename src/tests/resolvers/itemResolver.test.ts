@@ -13,20 +13,6 @@ import * as dbUtils from '../utils/db';
 const testDB = Container.get<DB>(DB);
 const apolloServerKoa = Container.get<ApolloServerKoa>(ApolloServerKoa);
 
-// const LOGIN = gql`
-//   mutation login($email: String!, $password: String!) {
-//     login(login: {
-//       email: $email,
-//       password: $password,
-//     }) {
-//       token
-//       user {
-//         id
-//       }
-//     }
-//   }
-// `;
-
 const GET_ITEM = gql`
   query item($itemId: Int!) {
     item(itemId: $itemId) {
