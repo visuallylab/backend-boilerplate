@@ -5,7 +5,7 @@
  */
 
 import * as DataLoader from 'dataloader';
-import { Connection } from 'typeorm';
+import { Connection, getConnection } from 'typeorm';
 import { Service } from 'typedi';
 import { InjectConnection } from 'typeorm-typedi-extensions';
 import { MiddlewareInterface, NextFn, ResolverData } from 'type-graphql';
@@ -26,7 +26,6 @@ export default class DataLoaderMiddleware implements MiddlewareInterface<Context
   }
 
   public async use({ context }: ResolverData<Context>, next: NextFn) {
-
     if (!context.dataLoader || !context.dataLoader.initialized) {
       context.dataLoader = {
         initialized: true,
@@ -34,6 +33,11 @@ export default class DataLoaderMiddleware implements MiddlewareInterface<Context
       };
 
       const loaders = context.dataLoader.loaders;
+
+      if (!this.connection) {
+        // if connection is undefined
+        this.connection = await getConnection();
+      }
 
       this.connection.entityMetadatas.forEach(entityMetadata => {
         const resolverName = entityMetadata.targetName;

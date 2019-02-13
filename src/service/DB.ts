@@ -1,17 +1,14 @@
 import * as path from 'path';
-import { Service, Container } from 'typedi';
-import { createConnections, useContainer } from 'typeorm';
+import { Service } from 'typedi';
+import { createConnections } from 'typeorm';
 
 import { ILogger } from '@/service/logger/Logger';
 import rootLogger from '@/service/logger/rootLogger';
-import { db } from '@/environment';
+import { db, TEST } from '@/environment';
 
 interface IDB {
   connect: () => Promise<void>;
 }
-
-// register typeorm IOC container
-useContainer(Container);
 
 @Service()
 export default class DB implements IDB {
@@ -35,7 +32,8 @@ export default class DB implements IDB {
             path.resolve(__dirname, '../entities/*.ts'),
           ],
           synchronize: true,
-          logging: ['error'],
+          logging: TEST ? false : ['error'],
+          dropSchema: !!TEST, // only for test
         },
       ]);
       this.logger.info('🚀 DB orm is connected!');

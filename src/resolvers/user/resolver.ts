@@ -73,22 +73,38 @@ export class UserResolver {
     if (!user) {
       throw new ForbiddenError('No this user!');
     }
+
+    // also delete the items of user
     const items = await ctx.dataLoader.loaders.User.items.load(user);
     const copyUser = { ...user, items };
 
     await this.itemRepository.remove(items);
     await this.userRepository.remove(user);
+
     return copyUser;
   }
 
   @FieldResolver()
   protected async items(@Root() user: User, @Ctx() ctx: Context) {
-    return ctx.dataLoader.loaders.User.items.load(user);
+    let items = await ctx.dataLoader.loaders.User.items.load(user);
+    if (items.length === 0) {
+      const isExistedUser = await this.userRepository.findOne({ id: user.id });
+      if (!isExistedUser) {
+        items = user.items;
+      }
+    }
+    return items;
   }
 
   @FieldResolver()
   protected async itemCount(@Root() user: User, @Ctx() ctx: Context) {
-    const items = await ctx.dataLoader.loaders.User.items.load(user);
+    let items = await ctx.dataLoader.loaders.User.items.load(user);
+    if (items.length === 0) {
+      const isExistedUser = await this.userRepository.findOne({ id: user.id });
+      if (!isExistedUser) {
+        items = user.items;
+      }
+    }
     return items.length;
   }
 }
