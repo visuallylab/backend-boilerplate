@@ -4,7 +4,7 @@ import { createConnections } from 'typeorm';
 
 import { ILogger } from '@/service/logger/Logger';
 import rootLogger from '@/service/logger/rootLogger';
-import { db, TEST } from '@/environment';
+import { db, TEST, DEBUG } from '@/environment';
 
 interface IDB {
   connect: () => Promise<void>;
@@ -30,9 +30,10 @@ export default class DB implements IDB {
           database: db.pgsql.database,
           entities: [
             path.resolve(__dirname, '../entities/*.ts'),
+            path.resolve(__dirname, '../entities/*.js'),
           ],
           synchronize: true,
-          logging: TEST ? false : ['error'],
+          logging: DEBUG ? ['error', 'query'] : ['error'],
           dropSchema: !!TEST, // only for test
         },
       ]);

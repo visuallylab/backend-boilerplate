@@ -5,11 +5,15 @@
   "main": "src/app.ts",
   "scripts": {
     "start": "ts-node -r tsconfig-paths/register src/app.ts --type-check",
+    "start:debug": "yarn start --debug",
+    "start:runtime": "TS_NODE_PROJECT=tsconfig.runtime.json node -r tsconfig-paths/register -r source-map-support/register build/app",
     "start:watch": "nodemon",
+    "build": "tsc --pretty -p tsconfig.json",
     "test": "NODE_ENV=test jest --runInBand --detectOpenHandles",
     "test:cov": "NODE_ENV=test jest --coverage --coverageDirectory ./coverage",
     "test:watch": "NODE_ENV=test jest --watch --onlyChanged",
-    "tslint-check": "tslint-config-prettier-check ./tslint.json"
+    "tslint-check": "tslint-config-prettier-check ./tslint.json",
+    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js"
   },
   "license": "MIT",
   "dependencies": {
@@ -22,6 +26,7 @@
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.6.2",
     "koa-bodyparser": "^4.2.1",
+    "koa-router": "^7.4.0",
     "lodash": "^4.17.11",
     "moment": "^2.23.0",
     "pg": "^7.7.1",
@@ -40,6 +45,7 @@
     "@types/jest": "^23.3.13",
     "@types/jsonwebtoken": "^8.3.2",
     "@types/koa": "^2.0.47",
+    "@types/koa-router": "^7.0.40",
     "@types/lodash": "^4.14.120",
     "@types/node": "^10.12.15",
     "@types/pg": "^7.4.11",
