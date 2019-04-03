@@ -73,8 +73,6 @@ export const db = {
 };
 
 export const aws = {
-  accessKeyId: env('AWS_ACCESS_KEY_ID'),
-  secretAccessKey: env('AWS_SECRET_ACCESS_KEY'),
   region: env('AWS_REGION'),
 };
 
