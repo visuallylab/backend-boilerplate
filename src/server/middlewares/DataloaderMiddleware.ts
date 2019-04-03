@@ -5,7 +5,8 @@
  */
 
 import * as DataLoader from 'dataloader';
-import { Connection, getConnection } from 'typeorm';
+import { Connection, getConnection, EntityMetadata } from 'typeorm';
+import { RelationMetadata } from 'typeorm/metadata/RelationMetadata';
 import { Service } from 'typedi';
 import { InjectConnection } from 'typeorm-typedi-extensions';
 import { MiddlewareInterface, NextFn, ResolverData } from 'type-graphql';
@@ -15,7 +16,8 @@ import { ILogger } from '@/service/logger/Logger';
 import rootLogger from '@/service/logger/rootLogger';
 
 @Service()
-export default class DataLoaderMiddleware implements MiddlewareInterface<Context> {
+export default class DataLoaderMiddleware
+  implements MiddlewareInterface<Context> {
   private logger: ILogger;
 
   @InjectConnection()
@@ -52,20 +54,96 @@ export default class DataLoaderMiddleware implements MiddlewareInterface<Context
         entityMetadata.relations.forEach(relation => {
           const relationName = relation.propertyName;
           if (!loaders[resolverName].hasOwnProperty(relationName)) {
-            // create a new instance of dataloader for every relation
-            loaders[resolverName][relationName] = new DataLoader(
-              entities => {
-                this.logger.debug(`load: ${resolverName}.${relationName}`);
-                return this.connection.relationIdLoader
+            // create an new instance of dataloader for every relation
+            loaders[resolverName][relationName] = new DataLoader<
+              EntityMetadata,
+              any
+            >(async entities => {
+              this.logger.debug(`load: ${resolverName}.${relationName}`);
+              if (relation.isManyToMany && relation.isManyToManyNotOwner) {
+                return this.loadManyToManyNotOwner(relation, entities);
+              }
+              return (
+                this.connection.relationIdLoader
                   // dataloader should return all entity object with parent and children.
                   .loadManyToManyRelationIdsAndGroup(relation, entities)
-                  .then(groups => groups.map(group => group.related));
-              },
-            );
+                  .then(groups => groups.map(group => group.related))
+              );
+            });
           }
         });
       });
     }
     return next();
+  }
+
+  private async loadManyToManyNotOwner(
+    relation: RelationMetadata,
+    entities: EntityMetadata[],
+  ): Promise<EntityMetadata[][]> {
+    /**
+     * FIXME:
+     * @see https://github.com/typeorm/typeorm/blob/master/src/query-builder/RelationIdLoader.ts
+     * Because ManyToManyNotOwner relationId name is wrong, and will get nothing
+     * We temporarily use this function to load
+     */
+    const relatedEntities = await this.connection.relationLoader.load(
+      relation,
+      entities,
+    );
+
+    if (!relatedEntities.length) {
+      return entities.map(() => []);
+    }
+
+    const relationIds = await this.connection.relationIdLoader.load(
+      relation,
+      entities,
+      relatedEntities,
+    );
+    const columns = relation.junctionEntityMetadata!.ownerColumns.map(
+      column => column.referencedColumn!,
+    );
+    const inverseColumns = relation.junctionEntityMetadata!.inverseColumns.map(
+      column => column.referencedColumn!,
+    );
+
+    return entities.map(entity => {
+      const related: EntityMetadata[] = [];
+      relationIds.forEach(relationId => {
+        const entityMatched = inverseColumns.every(column => {
+          return (
+            column.getEntityValue(entity) ===
+            relationId[
+              // Name is different with typeorm.
+              column.entityMetadata.name +
+                '_' +
+                relation.propertyPath.replace('.', '_') +
+                '_' +
+                column.propertyPath.replace('.', '_')
+            ]
+          );
+        });
+        if (entityMatched) {
+          relatedEntities.forEach(relatedEntity => {
+            const relatedEntityMatched = columns.every(column => {
+              return (
+                column.getEntityValue(relatedEntity) ===
+                relationId[
+                  // Name is different with typeorm.
+                  column.entityMetadata.name +
+                    '_' +
+                    column.propertyPath.replace('.', '_')
+                ]
+              );
+            });
+            if (relatedEntityMatched) {
+              related.push(relatedEntity);
+            }
+          });
+        }
+      });
+      return related;
+    });
   }
 }
