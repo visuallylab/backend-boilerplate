@@ -1,34 +1,9 @@
-import { InputType, Field, ID, Int } from 'type-graphql';
+import { InputType, Field, Int, ArgsType } from 'type-graphql';
 
 import User from '@/entities/User';
 
-@InputType('UserWhereType')
-class WhereType {
-  @Field(() => ID, { nullable: true })
-  public id: string;
-
-  @Field({ nullable: true })
-  public displayName: string;
-
-  @Field({ nullable: true })
-  public email: string;
-
-  @Field({ nullable: true })
-  public avatar: string;
-
-  @Field(() => Int, { nullable: true })
-  public itemCount: number;
-
-  @Field({ nullable: true })
-  public createdAt: Date;
-
-  @Field({ nullable: true })
-  public updatedAt: Date;
-}
-
-@InputType('UserOrderType')
-class OrderType {
-
+@InputType()
+class UserOrderType {
   @Field({ nullable: true })
   public id: 'ASC' | 'DESC';
 
@@ -39,24 +14,23 @@ class OrderType {
   public createdAt: 'ASC' | 'DESC';
 }
 
-@InputType('UserFindOptionsInput')
-export class FindOptionsInput {
-  @Field(() => WhereType, { nullable: true })
-  public where?: {
-    [key: string]: any,
-  };
+@ArgsType()
+export class UserFilterArgs {
+  @Field({ nullable: true })
+  public displayName?: string;
 
-  @Field(() => OrderType, { nullable: true })
-  public order?: {
-    id: 'ASC' | 'DESC',
-    itemCount: 'ASC' | 'DESC',
-    createdAt: 'ASC' | 'DESC',
-  };
+  @Field({ nullable: true })
+  public email?: string;
+
+  @Field(() => Int, { nullable: true })
+  public take?: number;
+
+  @Field(() => UserOrderType, { nullable: true })
+  public order?: UserOrderType;
 }
 
 @InputType()
 export class CreateUserInput implements Partial<User> {
-
   @Field()
   public displayName: string;
 

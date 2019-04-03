@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcrypt';
-import { Inject } from 'typedi';
+import { Service, Inject } from 'typedi';
 import { Repository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Resolver, Arg, Mutation } from 'type-graphql';
@@ -10,6 +10,7 @@ import User from '@/entities/User';
 
 import { LoginInput, LoginOutput } from './types';
 
+@Service()
 @Resolver()
 export class AuthResolver {
   @Inject()

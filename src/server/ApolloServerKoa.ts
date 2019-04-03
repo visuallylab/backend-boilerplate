@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as Koa from 'koa';
-import { Service, Inject } from 'typedi';
+import { Container, Service, Inject } from 'typedi';
 import { buildSchema } from 'type-graphql';
 import { ApolloServer } from 'apollo-server-koa';
 
@@ -38,6 +38,7 @@ export default class ApolloServerKoa {
         authChecker,
         dateScalarMode: 'timestamp',
         emitSchemaFile: !!DEVELOPMENT, // only for development
+        container: Container, // register 3rd party IOC container
       });
 
       const apolloServer = new ApolloServer({

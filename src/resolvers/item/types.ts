@@ -1,28 +1,9 @@
-import { InputType, Field, ID } from 'type-graphql';
+import { InputType, Field, Int, ArgsType } from 'type-graphql';
 
 import Item from '@/entities/Item';
 
-@InputType('ItemWhereType')
-class WhereType {
-  @Field(() => ID, { nullable: true })
-  public id: number;
-
-  @Field({ nullable: true })
-  public name: string;
-
-  @Field({ nullable: true })
-  public description: string;
-
-  @Field(() => Boolean, { nullable: true })
-  public complete: boolean;
-
-  @Field({ nullable: true })
-  public createdAt: Date;
-}
-
-@InputType('ItemOrderType')
-class OrderType {
-
+@InputType()
+class ItemOrderType {
   @Field({ nullable: true })
   public id: 'ASC' | 'DESC';
 
@@ -30,18 +11,22 @@ class OrderType {
   public createdAt: 'ASC' | 'DESC';
 }
 
-@InputType('ItemFindOptionsInput')
-export class FindOptionsInput {
-  @Field(() => WhereType, { nullable: true })
-  public where?: {
-    [key: string]: any,
-  };
+@ArgsType()
+export class ItemFilterArgs {
+  @Field({ nullable: true })
+  public name?: string;
 
-  @Field(() => OrderType, { nullable: true })
-  public order?: {
-    id: 'ASC' | 'DESC',
-    createdAt: 'ASC' | 'DESC',
-  };
+  @Field({ nullable: true })
+  public description?: string;
+
+  @Field(() => Boolean, { nullable: true })
+  public complete?: boolean;
+
+  @Field(() => Int, { nullable: true })
+  public take?: number;
+
+  @Field(() => ItemOrderType, { nullable: true })
+  public order?: ItemOrderType;
 }
 
 @InputType()
