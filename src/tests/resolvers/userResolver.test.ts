@@ -2,7 +2,7 @@ import gql from 'graphql-tag';
 import { Container } from 'typedi';
 import { createTestClient } from 'apollo-server-testing';
 
-import DB from '@/service/DB';
+import DB from '@/services/DB';
 import ApolloServerKoa from '@/server/ApolloServerKoa';
 import User from '@/entities/User';
 import * as env from '@/environment';
@@ -14,10 +14,7 @@ const apolloServerKoa = Container.get<ApolloServerKoa>(ApolloServerKoa);
 
 const LOGIN = gql`
   mutation login($email: String!, $password: String!) {
-    login(login: {
-      email: $email,
-      password: $password,
-    }) {
+    login(login: { email: $email, password: $password }) {
       token
       user {
         id
@@ -49,27 +46,26 @@ const GET_USERS = gql`
 `;
 
 const CREATE_USER = gql`
-  mutation createUser($displayName: String!, $email: String!, $password: String!) {
-    createUser(user: {
-      displayName: $displayName,
-      email: $email,
-      password: $password,
-    }) {
+  mutation createUser(
+    $displayName: String!
+    $email: String!
+    $password: String!
+  ) {
+    createUser(
+      user: { displayName: $displayName, email: $email, password: $password }
+    ) {
       displayName
       email
       items {
         id
       }
     }
-
   }
 `;
 
 const UPDATE_USER = gql`
   mutation updateUser($id: String!, $displayName: String) {
-    updateUser(id: $id, user: {
-      displayName: $displayName,
-    }) {
+    updateUser(id: $id, user: { displayName: $displayName }) {
       id
       displayName
       email
@@ -96,10 +92,7 @@ const DELETE_USER = gql`
 
 const ADD_ITEM = gql`
   mutation addItem($name: String!, $description: String) {
-    addItem (item: {
-      name: $name,
-      description: $description,
-    }) {
+    addItem(item: { name: $name, description: $description }) {
       name
       description
       user {
@@ -111,15 +104,13 @@ const ADD_ITEM = gql`
 
 let client: any;
 beforeAll(async () => {
-
   await testDB.connect();
 
-  const gqlServer  = await apolloServerKoa.initializeServer();
+  const gqlServer = await apolloServerKoa.initializeServer();
   client = createTestClient(gqlServer as any);
 });
 
 describe('UserResolver queries:', () => {
-
   test('get user null', async () => {
     const res = await client.query({
       query: GET_USER,
@@ -202,9 +193,11 @@ describe('UserResolver queries:', () => {
     });
 
     expect(res.data).toEqual({
-      users: [{
-        displayName: 'testQAQ',
-      }],
+      users: [
+        {
+          displayName: 'testQAQ',
+        },
+      ],
     });
   });
 
@@ -274,7 +267,6 @@ describe('UserResolver queries:', () => {
     const usersRes = await client.query({ query: GET_USERS });
     expect(usersRes.data).toEqual({ users: [] });
   });
-
 });
 
 afterAll(async () => {

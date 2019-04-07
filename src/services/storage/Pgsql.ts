@@ -1,8 +1,8 @@
 import { Service } from 'typedi';
 import { Pool, PoolClient } from 'pg';
 
-import { ILogger } from '@/service/logger/Logger';
-import rootLogger from '@/service/logger/rootLogger';
+import { ILogger } from '@/services/logger/Logger';
+import rootLogger from '@/services/logger/rootLogger';
 import * as env from '@/environment';
 
 interface IPgsql {

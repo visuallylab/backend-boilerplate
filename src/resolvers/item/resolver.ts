@@ -1,15 +1,27 @@
-import { Repository } from 'typeorm';
+import { Service } from 'typedi';
+import { Repository, FindManyOptions, Like } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
-import { Resolver, Query, Arg, Int, Mutation, Ctx, FieldResolver, Root, Authorized } from 'type-graphql';
-import { cloneDeep } from 'lodash';
+import {
+  Resolver,
+  Query,
+  Arg,
+  Args,
+  Int,
+  Mutation,
+  Ctx,
+  FieldResolver,
+  Root,
+  Authorized,
+} from 'type-graphql';
 import { ForbiddenError } from 'apollo-server-koa';
 
 import Item from '@/entities/Item';
 import User from '@/entities/User';
 
 import { Context } from '../typings';
-import { AddItemInput, UpdateItemInput, FindOptionsInput } from './types';
+import { AddItemInput, UpdateItemInput, ItemFilterArgs } from './types';
 
+@Service()
 @Resolver(Item)
 export class ItemResolver {
   constructor(
@@ -23,22 +35,24 @@ export class ItemResolver {
   }
 
   @Query(() => [Item])
-  public async items(
-    @Arg('findOptions', () => FindOptionsInput, { nullable: true}) findOptions: FindOptionsInput,
-  ) {
-    const copy = cloneDeep(findOptions);
-    return this.itemsRepository.find(copy);
+  public async items(@Args() filter: ItemFilterArgs) {
+    const query = filter ? buildQuery(filter) : {};
+    return this.itemsRepository.find(query);
   }
 
   @Authorized()
   @Mutation(() => Item)
-  public async addItem(@Arg('item') itemInput: AddItemInput, @Ctx() ctx: Context) {
+  public async addItem(
+    @Arg('item') itemInput: AddItemInput,
+    @Ctx() ctx: Context,
+  ) {
     const user = await this.userRepository.findOne({ id: ctx.me.id });
-    const item = this.itemsRepository.create({
-      ...itemInput,
-      user,
-    });
-    await this.itemsRepository.save(item);
+    const item = await this.itemsRepository.save(
+      this.itemsRepository.create({
+        ...itemInput,
+        user,
+      }),
+    );
     return item;
   }
 
@@ -50,35 +64,57 @@ export class ItemResolver {
   ) {
     const { name, description, complete } = itemInput;
     const match = await this.itemsRepository.findOne({ id });
-    if (!match) { return; }
-    if (name) { match.name = name; }
-    if (description) { match.description = description; }
-    if (complete) { match.complete = complete; }
+    if (!match) {
+      return;
+    }
+    if (name) {
+      match.name = name;
+    }
+    if (description) {
+      match.description = description;
+    }
+    if (complete) {
+      match.complete = complete;
+    }
 
-    await this.itemsRepository.save(match);
-    return match;
+    return this.itemsRepository.save(match);
   }
 
   @Authorized()
   @Mutation(() => Item)
-  public async deleteItem(@Arg('id') id: number, @Ctx() ctx: Context) {
+  public async deleteItem(@Arg('id') id: number) {
     const item = await this.itemsRepository.findOne({ id });
     if (!item) {
       throw new ForbiddenError('No this item!');
     }
-
-    const user = await ctx.dataLoader.loaders.Item.user.load(item);
-    const copyItem = { ...item, user };
-    await this.itemsRepository.remove(item);
-    return copyItem;
+    return this.itemsRepository.remove(item);
   }
 
   @FieldResolver()
   protected async user(@Root() item: Item, @Ctx() ctx: Context) {
-    let user = await ctx.dataLoader.loaders.Item.user.load(item);
-    if (!user) {
-      user = item.user;
-    }
-    return user;
+    return ctx.dataLoader.loaders.Item.user.load(item);
   }
+}
+
+function buildQuery(filter: ItemFilterArgs) {
+  const query: FindManyOptions<Item> = {};
+  query.where = {};
+  if (filter) {
+    if (filter.name) {
+      query.where.name = Like(`%${filter.name}%`);
+    }
+    if (filter.description) {
+      query.where.description = Like(`%${filter.description}%`);
+    }
+    if (filter.complete) {
+      query.where.complete = filter.complete;
+    }
+    if (filter.take) {
+      query.take = filter.take;
+    }
+    if (filter.order) {
+      query.order = filter.order;
+    }
+  }
+  return query;
 }

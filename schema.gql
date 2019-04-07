@@ -23,22 +23,9 @@ type Item {
   createdAt: Timestamp!
 }
 
-input ItemFindOptionsInput {
-  where: ItemWhereType
-  order: ItemOrderType
-}
-
 input ItemOrderType {
   id: String
   createdAt: String
-}
-
-input ItemWhereType {
-  id: ID
-  name: String
-  description: String
-  complete: Boolean
-  createdAt: Timestamp
 }
 
 input LoginInput {
@@ -63,12 +50,14 @@ type Mutation {
 
 type Query {
   item(itemId: Int!): Item
-  items(findOptions: ItemFindOptionsInput): [Item!]!
+  items(name: String, description: String, complete: Boolean, take: Int, order: ItemOrderType): [Item!]!
   user(id: String!): User
-  users(findOptions: UserFindOptionsInput): [User!]!
+  users(displayName: String, email: String, take: Int, order: UserOrderType): [User!]!
 }
 
-# The javascript `Date` as integer. Type represents date and time as number of milliseconds from start of UNIX epoch.
+"""
+The javascript `Date` as integer. Type represents date and time as number of milliseconds from start of UNIX epoch.
+"""
 scalar Timestamp
 
 input UpdateItemInput {
@@ -93,23 +82,8 @@ type User {
   updatedAt: Timestamp!
 }
 
-input UserFindOptionsInput {
-  where: UserWhereType
-  order: UserOrderType
-}
-
 input UserOrderType {
   id: String
   itemCount: String
   createdAt: String
-}
-
-input UserWhereType {
-  id: ID
-  displayName: String
-  email: String
-  avatar: String
-  itemCount: Int
-  createdAt: Timestamp
-  updatedAt: Timestamp
 }

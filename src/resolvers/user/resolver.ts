@@ -1,16 +1,27 @@
 import * as bcrypt from 'bcrypt';
-import { cloneDeep } from 'lodash';
-import { Repository } from 'typeorm';
+import { Service } from 'typedi';
+import { Repository, FindManyOptions, Like } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { ForbiddenError } from 'apollo-server-koa';
-import { Resolver, Query, Arg, Mutation, FieldResolver, Root, Ctx, Authorized } from 'type-graphql';
+import {
+  Resolver,
+  Query,
+  Arg,
+  Args,
+  Mutation,
+  FieldResolver,
+  Root,
+  Ctx,
+  Authorized,
+} from 'type-graphql';
 
 import User from '@/entities/User';
 import Item from '@/entities/Item';
 
 import { Context } from '../typings';
-import { CreateUserInput, UpdateUserInput, FindOptionsInput } from './types';
+import { CreateUserInput, UpdateUserInput, UserFilterArgs } from './types';
 
+@Service()
 @Resolver(User)
 export class UserResolver {
   constructor(
@@ -26,25 +37,22 @@ export class UserResolver {
 
   @Authorized()
   @Query(() => [User])
-  public async users(
-    @Arg('findOptions', () => FindOptionsInput, { nullable: true }) findOptions: FindOptionsInput,
-  ) {
-    const copy = cloneDeep(findOptions);
-    return this.userRepository.find(copy);
+  public async users(@Args() filter: UserFilterArgs) {
+    const query = filter ? buildQuery(filter) : {};
+    return this.userRepository.find(query);
   }
 
   @Mutation(() => User)
   public async createUser(@Arg('user') userInput: CreateUserInput) {
     const saltedHash = await bcrypt.hash(userInput.password, 10); // salted password
 
-    const saltedUser = {
-      ...userInput,
-      password: saltedHash,
-    };
-
-    const user = this.userRepository.create({ ...saltedUser });
-    await this.userRepository.save(user);
-    return user;
+    const created = await this.userRepository.save(
+      this.userRepository.create({
+        ...userInput,
+        password: saltedHash,
+      }),
+    );
+    return created;
   }
 
   @Authorized()
@@ -55,20 +63,22 @@ export class UserResolver {
   ) {
     const { displayName, email } = userInput;
     const match = await this.userRepository.findOne({ id });
-    if (!match) { return; }
-    if (displayName) { match.displayName = displayName; }
-    if (email) { match.email = email; }
+    if (!match) {
+      return;
+    }
+    if (displayName) {
+      match.displayName = displayName;
+    }
+    if (email) {
+      match.email = email;
+    }
 
-    await this.userRepository.save(match);
-    return match;
+    return this.userRepository.save(match);
   }
 
   @Authorized()
   @Mutation(() => User)
-  public async deleteUser(
-    @Arg('id') id: string,
-    @Ctx() ctx: Context,
-  ) {
+  public async deleteUser(@Arg('id') id: string, @Ctx() ctx: Context) {
     const user = await this.userRepository.findOne({ id });
     if (!user) {
       throw new ForbiddenError('No this user!');
@@ -76,35 +86,38 @@ export class UserResolver {
 
     // also delete the items of user
     const items = await ctx.dataLoader.loaders.User.items.load(user);
-    const copyUser = { ...user, items };
 
     await this.itemRepository.remove(items);
-    await this.userRepository.remove(user);
-
-    return copyUser;
+    return this.userRepository.remove(user);
   }
 
   @FieldResolver()
   protected async items(@Root() user: User, @Ctx() ctx: Context) {
-    let items = await ctx.dataLoader.loaders.User.items.load(user);
-    if (items.length === 0) {
-      const isExistedUser = await this.userRepository.findOne({ id: user.id });
-      if (!isExistedUser) {
-        items = user.items;
-      }
-    }
-    return items;
+    return ctx.dataLoader.loaders.User.items.load(user);
   }
 
   @FieldResolver()
   protected async itemCount(@Root() user: User, @Ctx() ctx: Context) {
-    let items = await ctx.dataLoader.loaders.User.items.load(user);
-    if (items.length === 0) {
-      const isExistedUser = await this.userRepository.findOne({ id: user.id });
-      if (!isExistedUser) {
-        items = user.items;
-      }
-    }
-    return items.length;
+    return (await ctx.dataLoader.loaders.User.items.load(user)).length;
   }
+}
+
+function buildQuery(filter: UserFilterArgs) {
+  const query: FindManyOptions<User> = {};
+  query.where = {};
+  if (filter) {
+    if (filter.displayName) {
+      query.where.displayName = Like(`%${filter.displayName}%`);
+    }
+    if (filter.email) {
+      query.where.email = Like(`%${filter.email}%`);
+    }
+    if (filter.take) {
+      query.take = filter.take;
+    }
+    if (filter.order) {
+      query.order = filter.order;
+    }
+  }
+  return query;
 }

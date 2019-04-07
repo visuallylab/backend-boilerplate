@@ -1,5 +1,11 @@
 import { Service } from 'typedi';
-import { sign, verify, SignOptions, VerifyOptions, VerifyErrors } from 'jsonwebtoken';
+import {
+  sign,
+  verify,
+  SignOptions,
+  VerifyOptions,
+  VerifyErrors,
+} from 'jsonwebtoken';
 
 import * as env from '@/environment';
 
@@ -30,15 +36,23 @@ export default class JwtService implements IJwtService {
     });
   }
 
-  public verify<T extends object | string>(token: string, options?: VerifyOptions) {
+  public verify<T extends object | string>(
+    token: string,
+    options?: VerifyOptions,
+  ) {
     return new Promise<T>((resolve, reject) => {
-      verify(token, this.secret, options, (err: VerifyErrors, decoded: object | string) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(<T> decoded);
-        }
-      });
+      verify(
+        token,
+        this.secret,
+        options,
+        (err: VerifyErrors, decoded: object | string) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(<T>decoded);
+          }
+        },
+      );
     });
   }
 }

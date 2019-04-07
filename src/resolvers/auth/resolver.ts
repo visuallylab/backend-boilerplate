@@ -1,15 +1,16 @@
 import * as bcrypt from 'bcrypt';
-import { Inject } from 'typedi';
+import { Service, Inject } from 'typedi';
 import { Repository } from 'typeorm';
 import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Resolver, Arg, Mutation } from 'type-graphql';
 import { ForbiddenError } from 'apollo-server-koa';
 
-import JwtService from '@/service/JwtService';
+import JwtService from '@/services/JwtService';
 import User from '@/entities/User';
 
 import { LoginInput, LoginOutput } from './types';
 
+@Service()
 @Resolver()
 export class AuthResolver {
   @Inject()

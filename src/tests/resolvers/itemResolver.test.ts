@@ -2,7 +2,7 @@ import gql from 'graphql-tag';
 import { Container } from 'typedi';
 import { createTestClient } from 'apollo-server-testing';
 
-import DB from '@/service/DB';
+import DB from '@/services/DB';
 import ApolloServerKoa from '@/server/ApolloServerKoa';
 import Item from '@/entities/Item';
 import User from '@/entities/User';
@@ -33,10 +33,7 @@ const GET_ITEMS = gql`
 
 const ADD_ITEM = gql`
   mutation addItem($name: String!, $description: String) {
-    addItem (item: {
-      name: $name,
-      description: $description,
-    }) {
+    addItem(item: { name: $name, description: $description }) {
       id
       name
       description
@@ -49,9 +46,7 @@ const ADD_ITEM = gql`
 
 const UPDATE_ITEM = gql`
   mutation updateItem($id: Float!, $complete: Boolean) {
-    updateItem(id: $id, item: {
-      complete: $complete,
-    }) {
+    updateItem(id: $id, item: { complete: $complete }) {
       id
       name
       description
@@ -79,24 +74,24 @@ const DELETE_ITEM = gql`
 
 let client: any;
 beforeAll(async () => {
-
   await testDB.connect();
 
-  const gqlServer  = await apolloServerKoa.initializeServer();
+  const gqlServer = await apolloServerKoa.initializeServer();
   client = createTestClient(gqlServer as any);
 
-  const users = await dbUtils.createTestUsers([{
-    displayName: 'test',
-    email: 'dummy@dummy.com',
-    password: '123321',
-  }]);
+  const users = await dbUtils.createTestUsers([
+    {
+      displayName: 'test',
+      email: 'dummy@dummy.com',
+      password: '123321',
+    },
+  ]);
 
   // insert test user
   env.test.user = { ...users[0] };
 });
 
 describe('UserResolver queries:', () => {
-
   test('get item null', async () => {
     const res = await client.query({
       query: GET_ITEM,
@@ -131,7 +126,6 @@ describe('UserResolver queries:', () => {
         },
       },
     });
-
   });
 
   test('update item: test-item-1', async () => {
@@ -154,7 +148,6 @@ describe('UserResolver queries:', () => {
         },
       },
     });
-
   });
 
   test('get item test-item-1', async () => {
@@ -174,10 +167,14 @@ describe('UserResolver queries:', () => {
 
   test('get items [test-item-1]', async () => {
     const res = await client.query({ query: GET_ITEMS });
-    expect(res.data).toEqual({ items: [{
-      id: '1',
-      name: 'test-item-1',
-    }] });
+    expect(res.data).toEqual({
+      items: [
+        {
+          id: '1',
+          name: 'test-item-1',
+        },
+      ],
+    });
   });
 
   test('delete item [test-item-1]', async () => {
@@ -215,7 +212,6 @@ describe('UserResolver queries:', () => {
     const res = await client.query({ query: GET_ITEMS });
     expect(res.data).toEqual({ items: [] });
   });
-
 });
 
 afterAll(async () => {
