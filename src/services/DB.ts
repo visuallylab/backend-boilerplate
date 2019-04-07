@@ -2,8 +2,8 @@ import * as path from 'path';
 import { Service } from 'typedi';
 import { createConnections } from 'typeorm';
 
-import { ILogger } from '@/service/logger/Logger';
-import rootLogger from '@/service/logger/rootLogger';
+import { ILogger } from '@/services/logger/Logger';
+import rootLogger from '@/services/logger/rootLogger';
 import { db, TEST, DEBUG } from '@/environment';
 
 interface IDB {

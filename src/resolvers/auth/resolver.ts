@@ -5,7 +5,7 @@ import { InjectRepository } from 'typeorm-typedi-extensions';
 import { Resolver, Arg, Mutation } from 'type-graphql';
 import { ForbiddenError } from 'apollo-server-koa';
 
-import JwtService from '@/service/JwtService';
+import JwtService from '@/services/JwtService';
 import User from '@/entities/User';
 
 import { LoginInput, LoginOutput } from './types';

@@ -1,4 +1,3 @@
-
 import { DEVELOPMENT } from '@/environment';
 
 export enum LogLevel {

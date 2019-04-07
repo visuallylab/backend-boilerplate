@@ -1,13 +1,13 @@
 import { Service } from 'typedi';
 import * as S3 from 'aws-sdk/clients/s3';
 
-import { ILogger } from '@/service/logger/Logger';
-import rootLogger from '@/service/logger/rootLogger';
+import { ILogger } from '@/services/logger/Logger';
+import rootLogger from '@/services/logger/rootLogger';
 
 export enum Bucket {}
 // put your bucket ...
 
-export interface IS3Service {
+export interface IService {
   upload: (
     params: S3.Types.PutObjectRequest,
   ) => Promise<S3.ManagedUpload.SendData>;
@@ -27,7 +27,7 @@ const bucketConfig: S3.ClientConfiguration = {
 };
 
 @Service()
-export default class S3Service implements IS3Service {
+export default class S3Service implements IService {
   private logger: ILogger;
   private s3 = new S3(bucketConfig);
 

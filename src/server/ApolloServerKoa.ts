@@ -12,9 +12,9 @@ import {
   apollo,
   DEBUG,
 } from '@/environment';
-import JwtService from '@/service/JwtService';
-import { ILogger } from '@/service/logger/Logger';
-import rootLogger from '@/service/logger/rootLogger';
+import JwtService from '@/services/JwtService';
+import { ILogger } from '@/services/logger/Logger';
+import rootLogger from '@/services/logger/rootLogger';
 import { authChecker, createDummyMe } from '@/resolvers/authChecker';
 import { Context } from '@/resolvers/typings';
 

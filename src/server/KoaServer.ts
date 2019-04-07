@@ -5,8 +5,8 @@ import * as Router from 'koa-router';
 
 import { VERSION } from '@/environment';
 
-import { ILogger } from '@/service/logger/Logger';
-import rootLogger from '@/service/logger/rootLogger';
+import { ILogger } from '@/services/logger/Logger';
+import rootLogger from '@/services/logger/rootLogger';
 
 @Service()
 export default class KoaServer {

@@ -12,8 +12,8 @@ import { InjectConnection } from 'typeorm-typedi-extensions';
 import { MiddlewareInterface, NextFn, ResolverData } from 'type-graphql';
 
 import { Context } from '@/resolvers/typings';
-import { ILogger } from '@/service/logger/Logger';
-import rootLogger from '@/service/logger/rootLogger';
+import { ILogger } from '@/services/logger/Logger';
+import rootLogger from '@/services/logger/rootLogger';
 
 @Service()
 export default class DataLoaderMiddleware

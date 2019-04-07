@@ -2,7 +2,7 @@ import gql from 'graphql-tag';
 import { Container } from 'typedi';
 import { createTestClient } from 'apollo-server-testing';
 
-import DB from '@/service/DB';
+import DB from '@/services/DB';
 import ApolloServerKoa from '@/server/ApolloServerKoa';
 
 import User from '@/entities/User';
@@ -14,10 +14,7 @@ const apolloServerKoa = Container.get<ApolloServerKoa>(ApolloServerKoa);
 
 const LOGIN = gql`
   mutation login($email: String!, $password: String!) {
-    login(login: {
-      email: $email,
-      password: $password,
-    }) {
+    login(login: { email: $email, password: $password }) {
       token
       user {
         displayName
@@ -29,21 +26,21 @@ const LOGIN = gql`
 
 let client: any;
 beforeAll(async () => {
-
   await testDB.connect();
 
-  const gqlServer  = await apolloServerKoa.initializeServer();
+  const gqlServer = await apolloServerKoa.initializeServer();
   client = createTestClient(gqlServer as any);
 
-  await dbUtils.createTestUsers([{
-    displayName: 'test',
-    email: 'dummy@dummy.com',
-    password: '123321',
-  }]);
+  await dbUtils.createTestUsers([
+    {
+      displayName: 'test',
+      email: 'dummy@dummy.com',
+      password: '123321',
+    },
+  ]);
 });
 
 describe('AuthResolver queries:', () => {
-
   test('login failed: throw Error "No this user!"', async () => {
     const res = await client.mutate({
       mutation: LOGIN,
