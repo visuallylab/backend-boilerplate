@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: 'app',
+      name: 'app', // change your name
       script: './build/app.js',
       instances: 1,
       autorestart: true,

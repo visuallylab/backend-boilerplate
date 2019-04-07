@@ -71,6 +71,24 @@ yarn test
 yarn test:watch
 ```
 
+### Production
+Suppose to use [PM2](http://pm2.keymetrics.io/) to manage your server process.
+
+```sh
+yarn global add pm2@latest -g
+```
+
+First, configure the `ecosystem.config.js` file, then build ans run server.
+
+```sh
+#build
+yarn build
+
+#run with pm2 and start only your app
+pm2 start --only app(or your can change app name)
+
+```
+
 ## File structure
 
 ```
