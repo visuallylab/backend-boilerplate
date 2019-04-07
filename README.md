@@ -115,7 +115,7 @@ backend-boilerplate/
 |   └── app.ts
 ```
 
-* `src/entities`: *Typeorm entities* which also connect *graphql* types or cross-container reusable *class-types*.
+* `src/entities`: *Typeorm entities* which also connect graphql types or cross-container reusable *class-types*.
 * `src/resolvers`: *Type-graphql resolvers* which implements almost api logic here.
 * `src/server`: Server folder which includes http-server and apollo-server.
 * `src/service`: Services which are connect to the outside world and perform most of the side-effects tasks. e.g. API client, third party integrations.
