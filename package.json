@@ -6,7 +6,7 @@
   "scripts": {
     "start": "ts-node -r tsconfig-paths/register src/app.ts --type-check",
     "start:debug": "yarn start --debug",
-    "start:runtime": "TS_NODE_PROJECT=tsconfig.runtime.json node -r tsconfig-paths/register -r source-map-support/register build/app",
+    "start:prod": "TS_NODE_PROJECT=tsconfig.prod.json node -r tsconfig-paths/register -r source-map-support/register build/app",
     "start:watch": "nodemon",
     "build": "tsc --pretty -p tsconfig.json",
     "test": "NODE_ENV=test jest --runInBand --detectOpenHandles",
