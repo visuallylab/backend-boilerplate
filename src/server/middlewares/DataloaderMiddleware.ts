@@ -4,7 +4,7 @@
  * @see https://github.com/19majkel94/type-graphql/issues/51#issuecomment-408556675
  */
 
-import * as DataLoader from 'dataloader';
+import * as Dataloader from 'dataloader';
 import { Connection, getConnection, EntityMetadata } from 'typeorm';
 import { RelationMetadata } from 'typeorm/metadata/RelationMetadata';
 import { Service } from 'typedi';
@@ -16,7 +16,7 @@ import { ILogger } from '@/services/logger/Logger';
 import rootLogger from '@/services/logger/rootLogger';
 
 @Service()
-export default class DataLoaderMiddleware
+export default class DataloaderMiddleware
   implements MiddlewareInterface<Context> {
   private logger: ILogger;
 
@@ -55,7 +55,7 @@ export default class DataLoaderMiddleware
           const relationName = relation.propertyName;
           if (!loaders[resolverName].hasOwnProperty(relationName)) {
             // create an new instance of dataloader for every relation
-            loaders[resolverName][relationName] = new DataLoader<
+            loaders[resolverName][relationName] = new Dataloader<
               EntityMetadata,
               any
             >(async entities => {

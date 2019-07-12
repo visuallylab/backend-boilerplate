@@ -24,7 +24,8 @@
     "noImplicitThis": true,
     "skipLibCheck": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "forceConsistentCasingInFileNames": true
   },
   "include": [
     "src/**/*",
