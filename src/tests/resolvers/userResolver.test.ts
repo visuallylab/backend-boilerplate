@@ -79,14 +79,7 @@ const UPDATE_USER = gql`
 
 const DELETE_USER = gql`
   mutation deleteUser($id: String!) {
-    deleteUser(id: $id) {
-      id
-      displayName
-      items {
-        name
-        description
-      }
-    }
+    deleteUser(id: $id)
   }
 `;
 
@@ -250,16 +243,7 @@ describe('UserResolver queries:', () => {
     });
 
     expect(deleteRes.data).toEqual({
-      deleteUser: {
-        id: loginRes.data.login.user.id,
-        displayName: 'testFuck !!',
-        items: [
-          {
-            name: 'test1',
-            description: 'yoyo-man',
-          },
-        ],
-      },
+      deleteUser: loginRes.data.login.user.id,
     });
   });
 

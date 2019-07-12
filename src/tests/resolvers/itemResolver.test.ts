@@ -60,15 +60,7 @@ const UPDATE_ITEM = gql`
 
 const DELETE_ITEM = gql`
   mutation deleteItem($id: Float!) {
-    deleteItem(id: $id) {
-      id
-      name
-      complete
-      description
-      user {
-        displayName
-      }
-    }
+    deleteItem(id: $id)
   }
 `;
 
@@ -186,15 +178,7 @@ describe('UserResolver queries:', () => {
     });
 
     expect(res.data).toEqual({
-      deleteItem: {
-        id: '1',
-        name: 'test-item-1',
-        complete: true,
-        description: 'yoyoy',
-        user: {
-          displayName: 'test',
-        },
-      },
+      deleteItem: '1',
     });
   });
 
