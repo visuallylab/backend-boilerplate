@@ -10,3 +10,6 @@ yarn-error.log*
 .env.test
 build
 node_modules
+*.gql
+*.swp
+.vscode
