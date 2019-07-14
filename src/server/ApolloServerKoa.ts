@@ -18,7 +18,7 @@ import rootLogger from '@/services/logger/rootLogger';
 import { authChecker, createDummyMe } from '@/resolvers/authChecker';
 import { Context } from '@/resolvers/typings';
 
-import DataLoaderMiddleware from './middlewares/DataLoaderMiddleware';
+import DataloaderMiddleware from './middlewares/DataloaderMiddleware';
 import { GraphQLError } from 'graphql';
 
 @Service()
@@ -38,7 +38,7 @@ export default class ApolloServerKoa {
   public async initializeServer(): Promise<ApolloServer> {
     if (!this.initialized) {
       const schema = await buildSchema({
-        globalMiddlewares: [DataLoaderMiddleware],
+        globalMiddlewares: [DataloaderMiddleware],
         resolvers: [
           path.resolve(__dirname, '../resolvers/**/resolver.ts'),
           path.resolve(__dirname, '../resolvers/**/resolver.js'), // production will bundle .js

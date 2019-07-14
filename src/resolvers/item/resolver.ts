@@ -12,6 +12,7 @@ import {
   FieldResolver,
   Root,
   Authorized,
+  ID,
 } from 'type-graphql';
 import { ForbiddenError } from 'apollo-server-koa';
 
@@ -81,13 +82,14 @@ export class ItemResolver {
   }
 
   @Authorized()
-  @Mutation(() => Item)
+  @Mutation(() => ID)
   public async deleteItem(@Arg('id') id: number) {
     const item = await this.itemsRepository.findOne({ id });
     if (!item) {
       throw new ForbiddenError('No this item!');
     }
-    return this.itemsRepository.remove(item);
+    await this.itemsRepository.remove(item);
+    return id;
   }
 
   @FieldResolver()

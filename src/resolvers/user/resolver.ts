@@ -13,6 +13,7 @@ import {
   Root,
   Ctx,
   Authorized,
+  ID,
 } from 'type-graphql';
 
 import User from '@/entities/User';
@@ -77,7 +78,7 @@ export class UserResolver {
   }
 
   @Authorized()
-  @Mutation(() => User)
+  @Mutation(() => ID)
   public async deleteUser(@Arg('id') id: string, @Ctx() ctx: Context) {
     const user = await this.userRepository.findOne({ id });
     if (!user) {
@@ -88,7 +89,9 @@ export class UserResolver {
     const items = await ctx.dataLoader.loaders.User.items.load(user);
 
     await this.itemRepository.remove(items);
-    return this.userRepository.remove(user);
+    await this.userRepository.remove(user);
+
+    return id;
   }
 
   @FieldResolver()

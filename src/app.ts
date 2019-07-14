@@ -21,8 +21,13 @@ const apolloServerKoa = Container.get<ApolloServerKoa>(ApolloServerKoa);
   const httpServer = await koaServer.initializeServer();
   {
     // gqlServer is an no-need resource, it can be released.
-    const gqlServer = await apolloServerKoa.initializeServer();
-    gqlServer.applyMiddleware({ app: httpServer });
+    try {
+      const gqlServer = await apolloServerKoa.initializeServer();
+      gqlServer.applyMiddleware({ app: httpServer });
+    } catch (error) {
+      // tslint:disable
+      console.error(error);
+    }
   }
 
   const port = parseInt(env.server.port, 10);
