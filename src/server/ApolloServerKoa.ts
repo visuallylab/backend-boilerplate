@@ -32,7 +32,6 @@ export default class ApolloServerKoa {
 
   constructor(logger = rootLogger) {
     this.logger = logger.create('apollo-server');
-    this.initializeServer();
   }
 
   public async initializeServer(): Promise<ApolloServer> {
@@ -89,7 +88,7 @@ export default class ApolloServerKoa {
       this.server = apolloServer;
       this.initialized = true;
 
-      this.logger.debug('🚀 Apollo server initialized!');
+      this.logger.debug('🚀 Apollo initialized!');
     }
 
     return this.server;

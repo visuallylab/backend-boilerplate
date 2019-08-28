@@ -1,4 +1,4 @@
-import * as moment from 'moment';
+import * as dayjs from 'dayjs';
 import { DEBUG } from '@/environment';
 import { ILogSender, LogMessage } from '../Logger';
 
@@ -11,7 +11,7 @@ export default class StdoutSender implements ILogSender {
 
   private format(logMessage: LogMessage): string {
     const messages = logMessage.messages.map(value => String(value));
-    const formatedTime = moment(logMessage.timestamp).format(
+    const formatedTime = dayjs(logMessage.timestamp).format(
       'YYYY-MM-DDTHH:mm:ss.SSS',
     );
     return `[${logMessage.level}]${

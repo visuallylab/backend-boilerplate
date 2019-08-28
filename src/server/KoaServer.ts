@@ -22,8 +22,6 @@ export default class KoaServer {
         return;
       }
     });
-    this.initializeRouter();
-    this.initializeServer();
   }
 
   public initializeRouter() {
@@ -46,6 +44,8 @@ export default class KoaServer {
 
   public async initializeServer(): Promise<Koa> {
     if (!this.initialized) {
+      this.initializeRouter();
+
       this.server.use(async (ctx, next) => {
         try {
           await next();
@@ -68,10 +68,11 @@ export default class KoaServer {
       this.server.use(bodyParser());
 
       this.server.use(this.router.routes()); // use routers
+      this.server.use(this.router.allowedMethods());
 
       this.initialized = true;
 
-      this.logger.debug('🚀 Koa server initialized!');
+      this.logger.debug('🚀 Koa initialized!');
     }
 
     return this.server;
