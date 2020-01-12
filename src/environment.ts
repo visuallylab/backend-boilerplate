@@ -46,7 +46,7 @@ export const VERSION = env('VERSION', 'No version info');
 export const IP_ADDRESS = ip.address();
 
 // functionality
-export const SKIP_AUTH = !!arg('--skip-auth', STAGE || TEST); // always skip auth in stage & TEST
+export const SKIP_AUTH = !!arg('--skip-auth');
 export const DEBUG = !!arg('--debug'); // open log on apollo server && DB
 
 // config

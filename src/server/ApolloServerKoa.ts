@@ -65,7 +65,7 @@ export default class ApolloServerKoa {
           : undefined,
         context: async ({ ctx }: { ctx: Koa.Context }) => {
           if (SKIP_AUTH) {
-            // always skip auth in stage & test
+            // use fake user in test
             const testUser = (TEST && test.user) || {};
             return { me: createDummyMe(testUser) };
           }
