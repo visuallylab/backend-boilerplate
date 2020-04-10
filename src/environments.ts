@@ -6,7 +6,7 @@ import * as ip from 'ip';
 const envConfigPath = (() => {
   switch (process.env.NODE_ENV) {
     case 'test':
-      return '../.env.test';
+      return '../.test.env';
     case 'development':
     case 'production':
     default:
@@ -42,18 +42,18 @@ if (!['development', 'stage', 'production', 'test'].includes(NODE_ENV)) {
 
 // metadata
 export const PROJECT = env('PROJECT', 'Awesome VisuallyLab!');
-export const VERSION = env('VERSION', 'No version info');
 export const IP_ADDRESS = ip.address();
 
 // functionality
-export const SKIP_AUTH = !!arg('--skip-auth');
+export const SKIP_AUTH = !!arg('--skip-auth', TEST);
 export const DEBUG = !!arg('--debug'); // open log on apollo server && DB
 
 // config
 export const server = {
-  port: env('PORT', '8081'),
+  port: env('PORT', '4000'),
   jwtSecretKey: env('JWT_SECRET_KEY'),
   jwtExpireIn: env('JWT_EXPIRE_IN'),
+  domain: env('DOMAIN', 'http://localhost:4000'),
 };
 
 export const slack = {

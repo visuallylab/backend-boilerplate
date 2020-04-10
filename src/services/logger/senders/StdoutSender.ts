@@ -1,5 +1,5 @@
 import * as dayjs from 'dayjs';
-import { DEBUG } from '@/environment';
+import { DEBUG } from '@/environments';
 import { ILogSender, LogMessage } from '../Logger';
 
 export default class StdoutSender implements ILogSender {
@@ -10,7 +10,7 @@ export default class StdoutSender implements ILogSender {
   }
 
   private format(logMessage: LogMessage): string {
-    const messages = logMessage.messages.map(value => String(value));
+    const messages = logMessage.messages.map((value) => String(value));
     const formatedTime = dayjs(logMessage.timestamp).format(
       'YYYY-MM-DDTHH:mm:ss.SSS',
     );

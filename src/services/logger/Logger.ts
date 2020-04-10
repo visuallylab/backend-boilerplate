@@ -1,4 +1,4 @@
-import { DEVELOPMENT } from '@/environment';
+import { DEVELOPMENT } from '@/environments';
 
 export enum LogLevel {
   Info = 'INFO',
@@ -81,7 +81,7 @@ export class Logger implements ILogger {
     }
 
     if (this.senders.length > 0) {
-      this.senders.forEach(sender => sender.send(logMessage));
+      this.senders.forEach((sender) => sender.send(logMessage));
     }
   }
 }

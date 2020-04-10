@@ -1,4 +1,4 @@
-import gql from 'graphql-tag';
+import { gql } from 'apollo-server-koa';
 import { Container } from 'typedi';
 import { createTestClient } from 'apollo-server-testing';
 
@@ -6,7 +6,7 @@ import DB from '@/services/DB';
 import ApolloServerKoa from '@/server/ApolloServerKoa';
 import Item from '@/entities/Item';
 import User from '@/entities/User';
-import * as env from '@/environment';
+import * as env from '@/environments';
 
 import * as dbUtils from '../utils/db';
 

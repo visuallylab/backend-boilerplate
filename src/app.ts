@@ -4,7 +4,7 @@ import './di';
 
 import { Container } from 'typedi';
 
-import * as env from '@/environment';
+import * as env from '@/environments';
 
 import DB from './services/DB';
 import KoaServer from './server/KoaServer';
@@ -34,7 +34,7 @@ const apolloServerKoa = Container.get<ApolloServerKoa>(ApolloServerKoa);
   httpServer.listen(port, () => {
     rootLogger.info(`🚀 HTTP Server ready at port ${port}`);
   });
-})().catch(error => {
+})().catch((error) => {
   rootLogger.error(error);
   process.exit(1);
 });

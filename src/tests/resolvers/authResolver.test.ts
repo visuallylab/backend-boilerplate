@@ -1,4 +1,4 @@
-import gql from 'graphql-tag';
+import { gql } from 'apollo-server-koa';
 import { Container } from 'typedi';
 import { createTestClient } from 'apollo-server-testing';
 

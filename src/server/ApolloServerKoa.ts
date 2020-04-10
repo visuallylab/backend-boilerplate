@@ -1,5 +1,6 @@
 import * as path from 'path';
 import * as Koa from 'koa';
+import { GraphQLError } from 'graphql';
 import { Service, Inject, Container } from 'typedi';
 import { buildSchema } from 'type-graphql';
 import { ApolloServer } from 'apollo-server-koa';
@@ -11,7 +12,8 @@ import {
   test,
   apollo,
   DEBUG,
-} from '@/environment';
+} from '@/environments';
+``;
 import JwtService from '@/services/JwtService';
 import { ILogger } from '@/services/logger/Logger';
 import rootLogger from '@/services/logger/rootLogger';
@@ -19,7 +21,7 @@ import { authChecker, createDummyMe } from '@/resolvers/authChecker';
 import { Context } from '@/resolvers/typings';
 
 import DataloaderMiddleware from './middlewares/DataloaderMiddleware';
-import { GraphQLError } from 'graphql';
+import { ErrorMessage } from '@/constants';
 
 @Service()
 export default class ApolloServerKoa {
@@ -53,6 +55,28 @@ export default class ApolloServerKoa {
         engine: !!apollo.engineApiKey && {
           apiKey: apollo.engineApiKey,
         },
+        plugins: [
+          {
+            requestDidStart() {
+              return {
+                didEncounterErrors({ response, errors }) {
+                  if (
+                    errors.find(
+                      (err) =>
+                        err.extensions &&
+                        err.extensions.code === 'UNAUTHENTICATED',
+                    ) &&
+                    response &&
+                    response.http
+                  ) {
+                    // error code: "UNAUTHENTICATED"
+                    response.http.status = 401;
+                  }
+                },
+              };
+            },
+          },
+        ],
         formatError: (error: GraphQLError) => {
           this.logger.error(error);
           return error;
@@ -63,25 +87,7 @@ export default class ApolloServerKoa {
               return response;
             }
           : undefined,
-        context: async ({ ctx }: { ctx: Koa.Context }) => {
-          if (SKIP_AUTH) {
-            // use fake user in test
-            const testUser = (TEST && test.user) || {};
-            return { me: createDummyMe(testUser) };
-          }
-          if (ctx.request.headers.authorization) {
-            try {
-              const token = ctx.request.headers.authorization.replace(
-                'Bearer ',
-                '',
-              );
-              const me = await this.jwt.verify<Context['me']>(token);
-              return { me };
-            } catch (err) {
-              this.logger.error(`Authorization token error! ${err}`);
-            }
-          }
-        },
+        context: (ctx) => this.parseContext(ctx),
         tracing: !!DEVELOPMENT, // only for development
       });
 
@@ -92,5 +98,33 @@ export default class ApolloServerKoa {
     }
 
     return this.server;
+  }
+
+  async parseContext({ ctx: koaContext }: { ctx: Koa.Context }) {
+    if (SKIP_AUTH) {
+      // use fake user in test
+      const testUser = (TEST && test.user) || {};
+      const testKoaContext = koaContext || {
+        cookies: {
+          get: () => ({}),
+          set: () => ({}),
+        },
+      };
+      return { me: createDummyMe(testUser), koaContext: testKoaContext };
+    }
+    if (koaContext.request.headers.authorization) {
+      try {
+        const token = koaContext.request.headers.authorization.replace(
+          'Bearer ',
+          '',
+        );
+        const me = await this.jwt.verify<Context['me']>(token);
+        return { me, koaContext };
+      } catch (err) {
+        this.logger.error(`${ErrorMessage.Auth.Token} ${err}`);
+      }
+    }
+
+    return { me: null, koaContext };
   }
 }

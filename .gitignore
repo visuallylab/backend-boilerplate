@@ -7,7 +7,7 @@ yarn-error.log*
 
 
 .env
-.env.test
+.test.env
 build
 node_modules
 *.gql

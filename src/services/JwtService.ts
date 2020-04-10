@@ -1,13 +1,7 @@
 import { Service } from 'typedi';
-import {
-  sign,
-  verify,
-  SignOptions,
-  VerifyOptions,
-  VerifyErrors,
-} from 'jsonwebtoken';
+import { sign, verify, SignOptions, VerifyOptions } from 'jsonwebtoken';
 
-import * as env from '@/environment';
+import * as env from '@/environments';
 
 type Payload = string | object | Buffer;
 
@@ -26,7 +20,7 @@ export default class JwtService implements IJwtService {
 
   public sign(payload: Payload, options: SignOptions = defaultSignOptions) {
     return new Promise<string>((resolve, reject) => {
-      sign(payload, this.secret, options, (err: Error, encoded: string) => {
+      sign(payload, this.secret, options, (err, encoded) => {
         if (err) {
           reject(err);
         } else {
@@ -41,18 +35,13 @@ export default class JwtService implements IJwtService {
     options?: VerifyOptions,
   ) {
     return new Promise<T>((resolve, reject) => {
-      verify(
-        token,
-        this.secret,
-        options,
-        (err: VerifyErrors, decoded: object | string) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(<T>decoded);
-          }
-        },
-      );
+      verify(token, this.secret, options, (err, decoded) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(<T>decoded);
+        }
+      });
     });
   }
 }

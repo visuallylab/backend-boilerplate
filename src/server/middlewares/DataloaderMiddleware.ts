@@ -41,7 +41,7 @@ export default class DataloaderMiddleware
         this.connection = await getConnection();
       }
 
-      this.connection.entityMetadatas.forEach(entityMetadata => {
+      this.connection.entityMetadatas.forEach((entityMetadata) => {
         const resolverName = entityMetadata.targetName;
         if (!resolverName) {
           return;
@@ -51,23 +51,26 @@ export default class DataloaderMiddleware
           loaders[resolverName] = {};
         }
 
-        entityMetadata.relations.forEach(relation => {
+        entityMetadata.relations.forEach((relation) => {
           const relationName = relation.propertyName;
           if (!loaders[resolverName].hasOwnProperty(relationName)) {
             // create an new instance of dataloader for every relation
             loaders[resolverName][relationName] = new Dataloader<
               EntityMetadata,
               any
-            >(async entities => {
+            >(async (entities) => {
               this.logger.debug(`load: ${resolverName}.${relationName}`);
               if (relation.isManyToMany && relation.isManyToManyNotOwner) {
+                // @ts-ignore
                 return this.loadManyToManyNotOwner(relation, entities);
               }
               return (
                 this.connection.relationIdLoader
+                  // @ts-ignore
                   // dataloader should return all entity object with parent and children.
                   .loadManyToManyRelationIdsAndGroup(relation, entities)
-                  .then(groups => groups.map(group => group.related))
+                  // @ts-ignore
+                  .then((groups) => groups.map((group) => group.related))
               );
             });
           }
@@ -102,16 +105,16 @@ export default class DataloaderMiddleware
       relatedEntities,
     );
     const columns = relation.junctionEntityMetadata!.ownerColumns.map(
-      column => column.referencedColumn!,
+      (column) => column.referencedColumn!,
     );
     const inverseColumns = relation.junctionEntityMetadata!.inverseColumns.map(
-      column => column.referencedColumn!,
+      (column) => column.referencedColumn!,
     );
 
-    return entities.map(entity => {
+    return entities.map((entity) => {
       const related: EntityMetadata[] = [];
-      relationIds.forEach(relationId => {
-        const entityMatched = inverseColumns.every(column => {
+      relationIds.forEach((relationId) => {
+        const entityMatched = inverseColumns.every((column) => {
           return (
             column.getEntityValue(entity) ===
             relationId[
@@ -125,8 +128,8 @@ export default class DataloaderMiddleware
           );
         });
         if (entityMatched) {
-          relatedEntities.forEach(relatedEntity => {
-            const relatedEntityMatched = columns.every(column => {
+          relatedEntities.forEach((relatedEntity) => {
+            const relatedEntityMatched = columns.every((column) => {
               return (
                 column.getEntityValue(relatedEntity) ===
                 relationId[

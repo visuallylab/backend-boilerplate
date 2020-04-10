@@ -4,7 +4,7 @@ import { createConnections } from 'typeorm';
 
 import { ILogger } from '@/services/logger/Logger';
 import rootLogger from '@/services/logger/rootLogger';
-import { db, TEST, DEBUG } from '@/environment';
+import { db, TEST, DEBUG } from '@/environments';
 
 interface IDB {
   connect: () => Promise<void>;

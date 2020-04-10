@@ -1,4 +1,4 @@
-import { DEVELOPMENT } from '@/environment';
+import { DEVELOPMENT } from '@/environments';
 import StdoutSender from './senders/StdoutSender';
 import { ILogger, Logger } from './Logger';
 

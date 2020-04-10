@@ -3,7 +3,7 @@ import { Pool, PoolClient } from 'pg';
 
 import { ILogger } from '@/services/logger/Logger';
 import rootLogger from '@/services/logger/rootLogger';
-import * as env from '@/environment';
+import * as env from '@/environments';
 
 interface IPgsql {
   connect: () => Promise<PoolClient | undefined>;
@@ -25,7 +25,7 @@ export class Pgsql implements IPgsql {
 
   constructor(logger = rootLogger) {
     this.logger = logger.create('service/pgsql');
-    this.pool.on('error', err => {
+    this.pool.on('error', (err) => {
       this.logger.error('Unexpected error on idle client', `${err}`);
     });
   }
@@ -42,6 +42,6 @@ export class Pgsql implements IPgsql {
   }
 
   public async closeAllConnection() {
-    await Promise.all(this.clients.map(client => client.release()));
+    await Promise.all(this.clients.map((client) => client.release()));
   }
 }
