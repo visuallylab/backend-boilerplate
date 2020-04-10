@@ -1,42 +1,26 @@
-/**
- * use type-graphql decorator to implement auth
- * @see https://19majkel94.github.io/type-graphql/docs/authorization.html
- */
-
-/**
- * TODO:
- * 1. Checking if user login
- * 2. Checking the Role and permission
- * @see https://github.com/Canner/graphql-rbac
- */
-
 import { AuthChecker } from 'type-graphql';
 
-import { Context, Role } from '@/resolvers/typings';
+import { Context } from '@/resolvers/typings';
+import { AuthenticationError } from 'apollo-server-koa';
+import { ErrorMessage } from '@/constants';
 
-export const authChecker: AuthChecker<Context> = ({ context: { me } }, roles) => {
-  if (roles.length === 0) {
-    // grant @Authorized() jwt verified
-    return !!me;
-  }
-
-  // define more roles access here
-
+export const authChecker: AuthChecker<Context> = ({ context: { me } }) => {
   if (!me) {
-    return false;
+    throw new AuthenticationError(ErrorMessage.System.PleaseLogin);
   }
 
-  if (me.roles.some(role => roles.includes(role))) {
-    return true;
-  }
+  // if (me.roles.some(role => roles.includes(role))) {
+  //   return true;
+  // }
 
-  return false;
+  return true;
 };
 
-export const createDummyMe = (option?: { [key: string]: any }): Context['me'] => ({
+export const createDummyMe = (option?: {
+  [key: string]: any;
+}): Context['me'] => ({
   id: '19514b75-1f74-4eb9-990b-e974126f3207',
   displayName: 'dummy',
   email: 'dummy@email.com',
-  roles: [Role.Admin],
   ...option,
 });

@@ -13,15 +13,15 @@ import {
   apollo,
   DEBUG,
 } from '@/environments';
-``;
+
 import JwtService from '@/services/JwtService';
 import { ILogger } from '@/services/logger/Logger';
 import rootLogger from '@/services/logger/rootLogger';
 import { authChecker, createDummyMe } from '@/resolvers/authChecker';
 import { Context } from '@/resolvers/typings';
+import { ErrorMessage } from '@/constants';
 
 import DataloaderMiddleware from './middlewares/DataloaderMiddleware';
-import { ErrorMessage } from '@/constants';
 
 @Service()
 export default class ApolloServerKoa {

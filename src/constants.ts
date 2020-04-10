@@ -10,4 +10,7 @@ export const ErrorMessage = {
   NotExist: {
     User: 'User does not exist.',
   },
+  System: {
+    PleaseLogin: 'Please Login!',
+  },
 };
