@@ -19,7 +19,7 @@
   "dependencies": {
     "@koa/cors": "^3.0.0",
     "apollo-server-koa": "^2.14.2",
-    "aws-sdk": "^2.601.0",
+    "aws-sdk": "^2.814.0",
     "bcrypt": "^5.0.0",
     "dataloader": "^2.0.0",
     "dayjs": "^1.8.23",
